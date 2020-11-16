@@ -4,3 +4,25 @@ output: html_document
 ---
 
 
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+```{r}
+county_poll = read_excel("./data/nycounty_results.xlsx") %>%
+  janitor::clean_names() %>%
+  mutate(
+    results = ifelse(biden_pct > 0.5, "D", "R") #D stands for Democratic party win and R stands for Republican Party win
+  ) %>%
+  select(county, results)
+
+county_poll
+```
+
+```{r}
+testing_df = read_csv("./data/New_York_State_Statewide_COVID-19_Testing.csv") %>%
+  janitor::clean_names()
+```
+
+
