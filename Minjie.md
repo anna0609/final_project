@@ -43,33 +43,28 @@ data cleaning
 
 ``` r
 nystate = read_csv("./data/nystate.csv") %>% 
-janitor::clean_names() 
+janitor::clean_names() %>% view()
 ```
 
     ## Parsed with column specification:
     ## cols(
-    ##   .default = col_character(),
-    ##   `Federal Provider Number` = col_double(),
-    ##   `Provider Zip Code` = col_double(),
-    ##   `Residents Weekly Admissions COVID-19` = col_double(),
-    ##   `Residents Total Admissions COVID-19` = col_double(),
-    ##   `Residents Weekly Confirmed COVID-19` = col_double(),
-    ##   `Residents Total Confirmed COVID-19` = col_double(),
-    ##   `Residents Weekly Suspected COVID-19` = col_double(),
-    ##   `Residents Total Suspected COVID-19` = col_double(),
-    ##   `Residents Weekly All Deaths` = col_double(),
-    ##   `Residents Total All Deaths` = col_double(),
-    ##   `Residents Weekly COVID-19 Deaths` = col_double(),
-    ##   `Residents Total COVID-19 Deaths` = col_double(),
-    ##   `Number of All Beds` = col_double(),
-    ##   `Total Number of Occupied Beds` = col_double(),
-    ##   `COVID-19 Point-of-Care Tests Performed on Residents Since Last Report` = col_double(),
-    ##   `COVID-19 Point-of-Care Tests Performed on Staff and/or Personnel Since Last Report` = col_double(),
-    ##   `Staff Weekly Confirmed COVID-19` = col_double(),
-    ##   `Staff Total Confirmed COVID-19` = col_double(),
-    ##   `Staff Weekly Suspected COVID-19` = col_double(),
-    ##   `Staff Total Suspected COVID-19` = col_double()
-    ##   # ... with 7 more columns
+    ##   .default = col_double(),
+    ##   `Week Ending` = col_character(),
+    ##   `Provider Name` = col_character(),
+    ##   `Submitted Data` = col_character(),
+    ##   `Shortage of Nursing Staff` = col_character(),
+    ##   `Shortage of Clinical Staff` = col_character(),
+    ##   `Shortage of Aides` = col_character(),
+    ##   `Shortage of Other Staff` = col_character(),
+    ##   `One-Week Supply of N95 Masks` = col_character(),
+    ##   `One-Week Supply of Surgical Masks` = col_character(),
+    ##   `One-Week Supply of Eye Protection` = col_character(),
+    ##   `One-Week Supply of Gowns` = col_character(),
+    ##   `One-Week Supply of Gloves` = col_character(),
+    ##   `One-Week Supply of Hand Sanitizer` = col_character(),
+    ##   `Ventilator Dependent Unit` = col_character(),
+    ##   `One-Week Supply of Ventilator Supplies` = col_character(),
+    ##   County = col_character()
     ## )
 
     ## See spec(...) for full column specifications.

@@ -29,6 +29,6 @@ scale_fill_discrete = scale_fill_viridis_d
 data cleaning
 ```{r}
 nystate = read_csv("./data/nystate.csv") %>% 
-janitor::clean_names() 
+janitor::clean_names() %>% view()
 ```
 
