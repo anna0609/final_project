@@ -4,25 +4,63 @@ output: html_document
 ---
 
 
-```{r}
+```{r message=FALSE, error=FALSE}
 library(tidyverse)
 library(readxl)
 ```
+## New York Presidential Results
 
-```{r}
+```{r message=FALSE, error=FALSE}
 county_poll = read_excel("./data/nycounty_results.xlsx") %>%
   janitor::clean_names() %>%
   mutate(
-    results = ifelse(biden_pct > 0.5, "D", "R") #D stands for Democratic party win and R stands for Republican Party win
+    election_result = ifelse(biden_pct > 0.5, "D", "R") #D stands for Democratic party win and R stands for Republican Party win
   ) %>%
-  select(county, results)
+  separate(county, c("county", "drop")) %>% 
+  select(county, election_result)
 
 county_poll
 ```
 
-```{r}
+## New York Statewide Covid-19 Testing
+
+```{r message=FALSE, error=FALSE}
 testing_df = read_csv("./data/New_York_State_Statewide_COVID-19_Testing.csv") %>%
   janitor::clean_names()
+```
+## New York Covid-19 Nursing home data
+
+```{r message=FALSE, error=FALSE}
+nh_df = read_csv("./data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv") %>%
+  janitor::clean_names() %>%
+  filter(provider_state == "NY") %>%
+  select(c(
+    week_ending,
+    provider_name,
+    residents_weekly_admissions_covid_19,
+    residents_total_admissions_covid_19,
+    residents_weekly_confirmed_covid_19,
+    residents_total_confirmed_covid_19,
+    residents_weekly_all_deaths,
+    residents_total_all_deaths,
+    residents_weekly_covid_19_deaths,
+    residents_total_covid_19_deaths,
+    number_of_all_beds,
+    total_number_of_occupied_beds,
+    staff_weekly_confirmed_covid_19,
+    staff_total_confirmed_covid_19,
+    ventilator_dependent_unit,
+    total_resident_confirmed_covid_19_cases_per_1_000_residents,
+    total_resident_covid_19_deaths_per_1_000_residents,
+    county
+    ))
+```
+## Merge election data onto nursing home data
+
+```{r}
+merged_df = left_join(nh_df, county_poll, by = "county")
+
+head(merged_df)
 ```
 
 

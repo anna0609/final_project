@@ -375,51 +375,99 @@ summary {
 </div>
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --</code></pre>
-<pre><code>## v ggplot2 3.3.2     v purrr   0.3.4
-## v tibble  3.0.3     v dplyr   1.0.2
-## v tidyr   1.1.2     v stringr 1.4.0
-## v readr   1.4.0     v forcats 0.5.0</code></pre>
-<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(readxl)</code></pre>
+<pre class="r"><code>library(tidyverse)
+library(readxl)</code></pre>
 <pre><code>## Warning: package &#39;readxl&#39; was built under R version 4.0.3</code></pre>
+<div id="new-york-presidential-results" class="section level2">
+<h2>New York Presidential Results</h2>
 <pre class="r"><code>county_poll = read_excel(&quot;./data/nycounty_results.xlsx&quot;) %&gt;%
   janitor::clean_names() %&gt;%
   mutate(
-    results = ifelse(biden_pct &gt; 0.5, &quot;D&quot;, &quot;R&quot;) #D stands for Democratic party win and R stands for Republican Party win
+    election_result = ifelse(biden_pct &gt; 0.5, &quot;D&quot;, &quot;R&quot;) #D stands for Democratic party win and R stands for Republican Party win
   ) %&gt;%
-  select(county, results)
-
-county_poll</code></pre>
+  separate(county, c(&quot;county&quot;, &quot;drop&quot;)) %&gt;% 
+  select(county, election_result)</code></pre>
+<pre><code>## Warning: Expected 2 pieces. Additional pieces discarded in 2 rows [31, 45].</code></pre>
+<pre class="r"><code>county_poll</code></pre>
 <pre><code>## # A tibble: 62 x 2
-##    county             results
-##    &lt;chr&gt;              &lt;chr&gt;  
-##  1 Albany County      D      
-##  2 Allegany County    R      
-##  3 Bronx County       D      
-##  4 Broome County      R      
-##  5 Cattaraugus County R      
-##  6 Cayuga County      R      
-##  7 Chautauqua County  R      
-##  8 Chemung County     R      
-##  9 Chenango County    R      
-## 10 Clinton County     R      
+##    county      election_result
+##    &lt;chr&gt;       &lt;chr&gt;          
+##  1 Albany      D              
+##  2 Allegany    R              
+##  3 Bronx       D              
+##  4 Broome      R              
+##  5 Cattaraugus R              
+##  6 Cayuga      R              
+##  7 Chautauqua  R              
+##  8 Chemung     R              
+##  9 Chenango    R              
+## 10 Clinton     R              
 ## # ... with 52 more rows</code></pre>
+</div>
+<div id="new-york-statewide-covid-19-testing" class="section level2">
+<h2>New York Statewide Covid-19 Testing</h2>
 <pre class="r"><code>testing_df = read_csv(&quot;./data/New_York_State_Statewide_COVID-19_Testing.csv&quot;) %&gt;%
   janitor::clean_names()</code></pre>
-<pre><code>## 
-## -- Column specification --------------------------------------------------------
-## cols(
-##   `Test Date` = col_character(),
-##   County = col_character(),
-##   `New Positives` = col_double(),
-##   `Cumulative Number of Positives` = col_double(),
-##   `Total Number of Tests Performed` = col_double(),
-##   `Cumulative Number of Tests Performed` = col_double()
-## )</code></pre>
+</div>
+<div id="new-york-covid-19-nursing-home-data" class="section level2">
+<h2>New York Covid-19 Nursing home data</h2>
+<pre class="r"><code>nh_df = read_csv(&quot;./data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv&quot;) %&gt;%
+  janitor::clean_names() %&gt;%
+  filter(provider_state == &quot;NY&quot;) %&gt;%
+  select(c(
+    week_ending,
+    provider_name,
+    residents_weekly_admissions_covid_19,
+    residents_total_admissions_covid_19,
+    residents_weekly_confirmed_covid_19,
+    residents_total_confirmed_covid_19,
+    residents_weekly_all_deaths,
+    residents_total_all_deaths,
+    residents_weekly_covid_19_deaths,
+    residents_total_covid_19_deaths,
+    number_of_all_beds,
+    total_number_of_occupied_beds,
+    staff_weekly_confirmed_covid_19,
+    staff_total_confirmed_covid_19,
+    ventilator_dependent_unit,
+    total_resident_confirmed_covid_19_cases_per_1_000_residents,
+    total_resident_covid_19_deaths_per_1_000_residents,
+    county
+    ))</code></pre>
+<pre><code>## Warning: 40533 parsing failures.
+##  row                                       col           expected actual                                                                           file
+## 1841 Number of Ventilators in Facility         1/0/T/F/TRUE/FALSE     13 &#39;./data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv&#39;
+## 1841 Any Current Supply of Ventilator Supplies 1/0/T/F/TRUE/FALSE     Y  &#39;./data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv&#39;
+## 1841 One-Week Supply of Ventilator Supplies    1/0/T/F/TRUE/FALSE     Y  &#39;./data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv&#39;
+## 1842 Number of Ventilators in Facility         1/0/T/F/TRUE/FALSE     13 &#39;./data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv&#39;
+## 1842 Any Current Supply of Ventilator Supplies 1/0/T/F/TRUE/FALSE     Y  &#39;./data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv&#39;
+## .... ......................................... .................. ...... ..............................................................................
+## See problems(...) for more details.</code></pre>
+</div>
+<div id="merge-election-data-onto-nursing-home-data" class="section level2">
+<h2>Merge election data onto nursing home data</h2>
+<pre class="r"><code>merged_df = left_join(nh_df, county_poll, by = &quot;county&quot;)
+
+head(merged_df)</code></pre>
+<pre><code>## # A tibble: 6 x 19
+##   week_ending provider_name residents_weekl~ residents_total~ residents_weekl~
+##   &lt;chr&gt;       &lt;chr&gt;                    &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 05/24/20    THE EMERALD ~                8                8                0
+## 2 05/31/20    THE EMERALD ~                0                8                0
+## 3 06/07/20    THE EMERALD ~                0                8                5
+## 4 06/14/20    THE EMERALD ~                0                8                0
+## 5 06/21/20    THE EMERALD ~                1                9                1
+## 6 06/28/20    THE EMERALD ~                0                9                1
+## # ... with 14 more variables: residents_total_confirmed_covid_19 &lt;dbl&gt;,
+## #   residents_weekly_all_deaths &lt;dbl&gt;, residents_total_all_deaths &lt;dbl&gt;,
+## #   residents_weekly_covid_19_deaths &lt;dbl&gt;,
+## #   residents_total_covid_19_deaths &lt;dbl&gt;, number_of_all_beds &lt;dbl&gt;,
+## #   total_number_of_occupied_beds &lt;dbl&gt;, staff_weekly_confirmed_covid_19 &lt;dbl&gt;,
+## #   staff_total_confirmed_covid_19 &lt;dbl&gt;, ventilator_dependent_unit &lt;chr&gt;,
+## #   total_resident_confirmed_covid_19_cases_per_1_000_residents &lt;dbl&gt;,
+## #   total_resident_covid_19_deaths_per_1_000_residents &lt;dbl&gt;, county &lt;chr&gt;,
+## #   election_result &lt;chr&gt;</code></pre>
+</div>
 
 
 
