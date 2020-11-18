@@ -23,6 +23,8 @@ NHCovid_df_county_monthly_death =
   mutate(month = factor(month, levels = c("05", "06", "07", "08", "09", "10"))) %>% 
   group_by(month, county) %>% 
   summarise(residents_covid19_deaths_per_month = n())
-  
+
+ggplot(NHCovid_df_county_monthly_death, aes(x = month, y = residents_covid19_deaths_per_month, color = county)) +
+  geom_histogram()
 ```
 
