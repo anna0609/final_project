@@ -1,0 +1,94 @@
+---
+title: "statewide_mortality_20201118"
+author: "Yutian Luo"
+date: "11/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+
+## 1. Data import and manipulation for county level death and population
+
+data source:
+
+https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/state/new-york
+
+
+```{r death_pop_df}
+df1 = 
+read.csv(file = "https://static.usafacts.org/public/data/covid-19/covid_deaths_usafacts.csv?_ga=2.213522960.567718552.1605752195-1031006592.1605647663")
+
+
+# population
+pop_df = 
+  read.csv(file = "./data/covid_county_population_usafacts.csv") %>% 
+  janitor::clean_names() %>% 
+  filter(state == "NY") %>% 
+  select(-state)
+
+
+# deaths
+death_df = 
+  read.csv(file = "./data/covid_deaths_usafacts.csv") %>% 
+  janitor::clean_names() %>% 
+  filter(state == "NY") %>% 
+  pivot_longer(
+    cols = 4:305,
+    names_to = "test_date",
+    values_to = "cummulative_death"
+  ) %>% 
+  mutate(
+    test_date = str_remove(test_date, pattern = "x"),
+    test_date = str_replace(test_date, pattern = "_", "/"),
+    test_date = str_replace(test_date, pattern = "_", "/"),
+    test_date = str_replace(test_date, pattern = "20$","2020")
+  ) %>% 
+  select(-state)
+
+# join dfs
+death_pop = 
+  left_join(pop_df, death_df, by = "county_fips") %>% 
+  select(county_fips, county_name.x, population, test_date, cummulative_death) %>% 
+  rename("county" = "county_name.x") %>% 
+  group_by(test_date, county) %>% 
+  relocate(test_date, county_fips, county) %>% 
+  mutate(
+    county = str_remove(county, pattern = ".County")
+  ) %>% 
+  select(-county_fips)
+  
+
+```
+
+
+## 2. Data merging with new_york_statewide_covid_19_testing.csv data
+
+data source: <provide>
+
+```{r ny_state_test_pop_mor}
+
+ny_statewide_data = 
+  read.csv("./data/New_York_State_Statewide_COVID-19_Testing.csv") %>% 
+  janitor::clean_names() 
+
+ny_state_test_pop_mor = 
+  left_join(ny_statewide_data, death_pop, by = c("test_date","county")) %>% 
+  mutate(
+    mortality_rate = cummulative_death / cumulative_number_of_positives
+  )
+
+```
+
+
+# save as csv
+```{r}
+
+write_csv(ny_state_test_pop_mor, path = "./data/ny_state_test_pop_mor.csv")
+
+```
+
