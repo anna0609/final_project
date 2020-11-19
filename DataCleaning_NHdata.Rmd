@@ -41,5 +41,11 @@ NHCovid_df_county_monthly_confirmed =
   group_by(month, county) %>% 
   summarise(residents_covid19_cases_per_month = sum(residents_weekly_confirmed_covid_19))
 
+NHCovid_df_mortality = 
+  left_join(NHCovid_df_county_monthly_confirmed, NHCovid_df_county_monthly_death, by = c("month", "county")) %>% 
+  mutate(mortality = residents_covid19_deaths_per_month/residents_covid19_cases_per_month) %>% 
+  filter(mortality = )
+
+
 ```
 
