@@ -7,14 +7,14 @@ Minjie Bao
 library(tidyverse)
 ```
 
-    ## ── Attaching packages ──────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ────────────────────────────────────── tidyverse 1.3.0 ──
 
     ## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
     ## ✓ tibble  3.0.3     ✓ dplyr   1.0.2
     ## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
     ## ✓ readr   1.3.1     ✓ forcats 0.5.0
 
-    ## ── Conflicts ─────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ───────────────────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -200,12 +200,15 @@ shortage_of_stuff =
 NHCovid_df_by_month %>% 
   filter(submitted_data == "Y") %>% 
   select(month, county, starts_with("shortage")) %>% 
-  filter(shortage_of_nursing_staff != "N"|shortage_of_clinical_staff != "N"|shortage_of_aides != "N"|shortage_of_other_staff != "N") %>% 
     mutate(
-      month = fct_inorder(month),
-      total_shortage = "Y"
-    ) %>% 
-distinct(county, month)
+     total_shortage = case_when(
+      shortage_of_nursing_staff != "N" ~ "Y",
+      shortage_of_clinical_staff != "N" ~ "Y",
+      shortage_of_aides != "N" ~ "Y",
+      shortage_of_other_staff != "N" ~ "Y"
+    )
+  ) %>% 
+  drop_na()
 
 #plot
 shortage_of_stuff_plot =

@@ -115,12 +115,15 @@ shortage_of_stuff =
 NHCovid_df_by_month %>% 
   filter(submitted_data == "Y") %>% 
   select(month, county, starts_with("shortage")) %>% 
-  filter(shortage_of_nursing_staff != "N"|shortage_of_clinical_staff != "N"|shortage_of_aides != "N"|shortage_of_other_staff != "N") %>% 
     mutate(
-      month = fct_inorder(month),
-      total_shortage = "Y"
-    ) %>% 
-distinct(county, month)
+     total_shortage = case_when(
+      shortage_of_nursing_staff != "N" ~ "Y",
+      shortage_of_clinical_staff != "N" ~ "Y",
+      shortage_of_aides != "N" ~ "Y",
+      shortage_of_other_staff != "N" ~ "Y"
+    )
+  ) %>% 
+  drop_na()
 
 #plot
 shortage_of_stuff_plot =
