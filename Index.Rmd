@@ -7,6 +7,7 @@ output: html_document
 ```{r message=FALSE, error=FALSE}
 library(tidyverse)
 library(readxl)
+library(lubridate)
 ```
 ## New York Presidential Results
 
@@ -28,6 +29,21 @@ county_poll
 testing_df = read_csv("./data/New_York_State_Statewide_COVID-19_Testing.csv") %>%
   janitor::clean_names()
 ```
+
+Monthly infection rate at Albany county
+```{r}
+testing_df_albany = testing_df %>%
+  transform(test_date = as.Date(test_date, "%m/%d/%y")) %>%
+  filter(county == "Albany") %>% 
+  group_by(month = floor_date(test_date, "month")) %>%
+  summarise(
+    monthly_new_positives = sum(new_positives),
+    monthly_new_tests_performed = sum(total_number_of_tests_performed),
+    monthly_infection_rate = monthly_new_positives/monthly_new_tests_performed
+    )
+```
+
+
 ## New York Covid-19 Nursing home data
 
 ```{r message=FALSE, error=FALSE}

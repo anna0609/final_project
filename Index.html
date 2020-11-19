@@ -378,6 +378,7 @@ summary {
 <pre class="r"><code>library(tidyverse)
 library(readxl)</code></pre>
 <pre><code>## Warning: package &#39;readxl&#39; was built under R version 4.0.3</code></pre>
+<pre class="r"><code>library(lubridate)</code></pre>
 <div id="new-york-presidential-results" class="section level2">
 <h2>New York Presidential Results</h2>
 <pre class="r"><code>county_poll = read_excel(&quot;./data/nycounty_results.xlsx&quot;) %&gt;%
@@ -408,6 +409,17 @@ library(readxl)</code></pre>
 <h2>New York Statewide Covid-19 Testing</h2>
 <pre class="r"><code>testing_df = read_csv(&quot;./data/New_York_State_Statewide_COVID-19_Testing.csv&quot;) %&gt;%
   janitor::clean_names()</code></pre>
+<p>Monthly infection rate at Albany county</p>
+<pre class="r"><code>testing_df_albany = testing_df %&gt;%
+  transform(test_date = as.Date(test_date, &quot;%m/%d/%y&quot;)) %&gt;%
+  filter(county == &quot;Albany&quot;) %&gt;% 
+  group_by(month = floor_date(test_date, &quot;month&quot;)) %&gt;%
+  summarise(
+    monthly_new_positives = sum(new_positives),
+    monthly_new_tests_performed = sum(total_number_of_tests_performed),
+    monthly_infection_rate = monthly_new_positives/monthly_new_tests_performed
+    )</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 </div>
 <div id="new-york-covid-19-nursing-home-data" class="section level2">
 <h2>New York Covid-19 Nursing home data</h2>
