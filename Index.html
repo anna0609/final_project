@@ -408,10 +408,10 @@ library(readxl)</code></pre>
 <div id="new-york-statewide-covid-19-testing" class="section level2">
 <h2>New York Statewide Covid-19 Testing</h2>
 <pre class="r"><code>testing_df = read_csv(&quot;./data/New_York_State_Statewide_COVID-19_Testing.csv&quot;) %&gt;%
-  janitor::clean_names()</code></pre>
+  janitor::clean_names() %&gt;%
+  transform(test_date = as.Date(test_date, &quot;%m/%d/%y&quot;))</code></pre>
 <p>Monthly infection rate at Albany county</p>
 <pre class="r"><code>testing_df_albany = testing_df %&gt;%
-  transform(test_date = as.Date(test_date, &quot;%m/%d/%y&quot;)) %&gt;%
   filter(county == &quot;Albany&quot;) %&gt;% 
   group_by(month = floor_date(test_date, &quot;month&quot;)) %&gt;%
   summarise(
@@ -420,6 +420,124 @@ library(readxl)</code></pre>
     monthly_infection_rate = monthly_new_positives/monthly_new_tests_performed
     )</code></pre>
 <pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<p>write a function which takes county_name and returns the monthly infection rate for that county</p>
+<pre class="r"><code>monthly_infection_rate = function(county_name){
+  infection_rate_df = testing_df %&gt;%
+  filter(county == county_name) %&gt;% 
+  group_by(month = floor_date(test_date, &quot;month&quot;)) %&gt;%
+  summarise(
+    monthly_new_positives = sum(new_positives),
+    monthly_new_tests_performed = sum(total_number_of_tests_performed),
+    monthly_infection_rate = monthly_new_positives/monthly_new_tests_performed
+    )
+  infection_rate_df
+}
+
+monthly_infection_rate(&quot;Broome&quot;)</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## # A tibble: 9 x 4
+##   month      monthly_new_positiv~ monthly_new_tests_perfor~ monthly_infection_r~
+##   &lt;date&gt;                    &lt;dbl&gt;                     &lt;dbl&gt;                &lt;dbl&gt;
+## 1 2020-03-01                   42                       368              0.114  
+## 2 2020-04-01                  257                      2103              0.122  
+## 3 2020-05-01                  275                     13809              0.0199 
+## 4 2020-06-01                  148                     21307              0.00695
+## 5 2020-07-01                  326                     22333              0.0146 
+## 6 2020-08-01                  263                     28916              0.00910
+## 7 2020-09-01                  418                     29146              0.0143 
+## 8 2020-10-01                 2009                     55004              0.0365 
+## 9 2020-11-01                  656                     23497              0.0279</code></pre>
+<pre class="r"><code>counties_ny = testing_df %&gt;%
+  pull(county) %&gt;%
+  unique()
+
+infection_rate_results = 
+  tibble(
+    county_name = counties_ny
+  ) %&gt;% 
+  mutate(
+    output_lists = map(.x = county_name, ~ monthly_infection_rate(.x)),
+    estimate_df = map(output_lists, bind_rows)
+  ) %&gt;% 
+  select(-output_lists) %&gt;% 
+  unnest(estimate_df)</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)
+## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code>infection_rate_results</code></pre>
+<pre><code>## # A tibble: 558 x 5
+##    county_name month      monthly_new_posi~ monthly_new_tests~ monthly_infectio~
+##    &lt;chr&gt;       &lt;date&gt;                 &lt;dbl&gt;              &lt;dbl&gt;             &lt;dbl&gt;
+##  1 Albany      2020-03-01               240               3704           0.0648 
+##  2 Albany      2020-04-01               964               6984           0.138  
+##  3 Albany      2020-05-01               678              14613           0.0464 
+##  4 Albany      2020-06-01               230              23788           0.00967
+##  5 Albany      2020-07-01               403              27414           0.0147 
+##  6 Albany      2020-08-01               271              32030           0.00846
+##  7 Albany      2020-09-01               347              30415           0.0114 
+##  8 Albany      2020-10-01               617              47692           0.0129 
+##  9 Albany      2020-11-01               779              33750           0.0231 
+## 10 Allegany    2020-03-01                 9                135           0.0667 
+## # ... with 548 more rows</code></pre>
 </div>
 <div id="new-york-covid-19-nursing-home-data" class="section level2">
 <h2>New York Covid-19 Nursing home data</h2>

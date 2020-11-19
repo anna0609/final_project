@@ -27,13 +27,13 @@ county_poll
 
 ```{r message=FALSE, error=FALSE}
 testing_df = read_csv("./data/New_York_State_Statewide_COVID-19_Testing.csv") %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  transform(test_date = as.Date(test_date, "%m/%d/%y"))
 ```
 
 Monthly infection rate at Albany county
 ```{r}
 testing_df_albany = testing_df %>%
-  transform(test_date = as.Date(test_date, "%m/%d/%y")) %>%
   filter(county == "Albany") %>% 
   group_by(month = floor_date(test_date, "month")) %>%
   summarise(
@@ -41,6 +41,40 @@ testing_df_albany = testing_df %>%
     monthly_new_tests_performed = sum(total_number_of_tests_performed),
     monthly_infection_rate = monthly_new_positives/monthly_new_tests_performed
     )
+```
+write a function which takes county_name and returns the monthly infection rate for that county
+```{r}
+monthly_infection_rate = function(county_name){
+  infection_rate_df = testing_df %>%
+  filter(county == county_name) %>% 
+  group_by(month = floor_date(test_date, "month")) %>%
+  summarise(
+    monthly_new_positives = sum(new_positives),
+    monthly_new_tests_performed = sum(total_number_of_tests_performed),
+    monthly_infection_rate = monthly_new_positives/monthly_new_tests_performed
+    )
+  infection_rate_df
+}
+
+monthly_infection_rate("Broome")
+```
+```{r}
+counties_ny = testing_df %>%
+  pull(county) %>%
+  unique()
+
+infection_rate_results = 
+  tibble(
+    county_name = counties_ny
+  ) %>% 
+  mutate(
+    output_lists = map(.x = county_name, ~ monthly_infection_rate(.x)),
+    estimate_df = map(output_lists, bind_rows)
+  ) %>% 
+  select(-output_lists) %>% 
+  unnest(estimate_df)
+
+infection_rate_results
 ```
 
 
