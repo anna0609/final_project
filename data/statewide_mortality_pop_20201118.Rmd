@@ -20,13 +20,13 @@ https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/state/new-yo
 
 
 ```{r death_pop_df}
-df1 = 
-read.csv(file = "https://static.usafacts.org/public/data/covid-19/covid_deaths_usafacts.csv?_ga=2.213522960.567718552.1605752195-1031006592.1605647663")
+# df1 = 
+# read.csv(file = "https://static.usafacts.org/public/data/covid-19/covid_deaths_usafacts.csv?_ga=2.213522960.567718552.1605752195-1031006592.1605647663")
 
 
 # population
 pop_df = 
-  read.csv(file = "./data/covid_county_population_usafacts.csv") %>% 
+  read.csv(file = "./covid_county_population_usafacts.csv") %>% 
   janitor::clean_names() %>% 
   filter(state == "NY") %>% 
   select(-state)
@@ -34,7 +34,7 @@ pop_df =
 
 # deaths
 death_df = 
-  read.csv(file = "./data/covid_deaths_usafacts.csv") %>% 
+  read.csv(file = "./covid_deaths_usafacts.csv") %>% 
   janitor::clean_names() %>% 
   filter(state == "NY") %>% 
   pivot_longer(
@@ -73,7 +73,7 @@ data source: <provide>
 ```{r ny_state_test_pop_mor}
 
 ny_statewide_data = 
-  read.csv("./data/New_York_State_Statewide_COVID-19_Testing.csv") %>% 
+  read.csv("./New_York_State_Statewide_COVID-19_Testing.csv") %>% 
   janitor::clean_names() 
 
 ny_state_test_pop_mor = 
@@ -88,7 +88,7 @@ ny_state_test_pop_mor =
 # save as csv
 ```{r}
 
-write_csv(ny_state_test_pop_mor, path = "./data/ny_state_test_pop_mor.csv")
+write_csv(ny_state_test_pop_mor, path = "./ny_state_test_pop_mor.csv")
 
 ```
 
