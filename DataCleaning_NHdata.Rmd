@@ -41,10 +41,22 @@ NHCovid_df_county_monthly_confirmed =
   group_by(month, county) %>% 
   summarise(residents_covid19_cases_per_month = sum(residents_weekly_confirmed_covid_19))
 
+# Summarize monthly admission cases
+NHCovid_df_county_monthly_admission =
+  NHCovid_df_by_month %>% 
+  # to eliminate N/A, filter by submitted data and quality check
+  filter(submitted_data == "Y", passed_quality_assurance_check == "Y") %>% 
+  group_by(month, county) %>% 
+  summarise(residents_covid19_admission_per_month = sum(residents_weekly_admissions_covid_19))
+
+NHCovid_df_case = 
+  left_join(NHCovid_df_county_monthly_confirmed, NHCovid_df_county_monthly_admission, by = c("month", "county")) %>% 
+  mutate(total_cases = residents_covid19_cases_per_month + residents_covid19_admission_per_month) 
+
 NHCovid_df_mortality = 
-  left_join(NHCovid_df_county_monthly_confirmed, NHCovid_df_county_monthly_death, by = c("month", "county")) %>% 
-  mutate(mortality = residents_covid19_deaths_per_month/residents_covid19_cases_per_month) %>% 
-  filter(mortality = )
+  left_join(NHCovid_df_case, NHCovid_df_county_monthly_death, by = c("month", "county")) %>% 
+  mutate(mortality = residents_covid19_deaths_per_month / total_cases) %>% 
+  filter(mortality >= 0)
 
 
 ```
