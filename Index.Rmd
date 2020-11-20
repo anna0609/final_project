@@ -75,6 +75,10 @@ infection_rate_results =
   unnest(estimate_df)
 
 infection_rate_results
+
+infection_rate_results %>%
+  ggplot(aes(month, monthly_infection_rate, color = county_name)) +
+  geom_line()
 ```
 
 
