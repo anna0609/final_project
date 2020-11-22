@@ -1,0 +1,5 @@
+---
+title: "Fun Explorations"
+output:
+  html_document
+---
