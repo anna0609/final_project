@@ -1,13 +1,12 @@
 ---
 title: "Nursing home data edit"
-author: Minjie Bao
-date: 2020-11-19
+author: Jianting Shi
+date: 2020-11-22
 output: github_document
 ---
 
 ```{r}
 library(tidyverse)
-
 
 knitr::opts_chunk$set(
   fig.width = 6,
