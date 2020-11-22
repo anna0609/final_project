@@ -25,17 +25,28 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
+# Read in Nursing Home raw data and filter data from NY only
+
 ```{r}
 # Read in Covid Nursing Home data and filter data from only NY state
 NHCovid_df = 
   read_csv("./Data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv") %>% 
   janitor::clean_names() %>% 
   filter(provider_state == "NY")
+
+# Read in facility info data
+NH_NY_Facility = 
+  read_csv("./Data/NH_20Profiles/FACILITY_INFO.csv") %>% 
+  janitor::clean_names() %>% 
+  group_by(county) %>% 
+  summarize(
+    employee_flu_vaccination_rate = mean(employee_flu_vaccination_rate)
+  )
 ```
 
 
 ```{r}
-# Break down specific date into month
+# Break down specific date into month, day, year
 NHCovid_df_by_month = 
   NHCovid_df %>% 
   separate(week_ending, into = c("month", "day", "year"), sep = "/") %>% 
@@ -46,19 +57,59 @@ NHCovid_df_by_month =
     month = str_replace(month, "07", "7"),
     month = str_replace(month, "08", "8"),
     month = str_replace(month, "09", "9"),
-    )
+  ) %>% 
+  mutate(
+    day = as.numeric(day)
+  )  
+
+# Filter by day to get monthly cases and deaths
+NHCovid_df_by_day =
+  NHCovid_df_by_month %>% 
+  filter(day > 24)
 ```
 
+# Summarize using residents total covid-19 confirmed and deaths number
 
 ```{r}
 # data (Summarize monthly death)
 NHCovid_df_county_monthly_death =
-  NHCovid_df_by_month %>% 
+  NHCovid_df_by_day %>% 
   # to eliminate N/A, filter by submitted data and quality check
   filter(submitted_data == "Y") %>% 
   group_by(month, county) %>% 
-  summarise(residents_covid19_deaths_per_month = sum(residents_weekly_covid_19_deaths)) %>% 
+  summarise(residents_covid19_deaths_per_month = sum(residents_total_covid_19_deaths)) %>% 
   drop_na()
+
+# data (summarize monthly death by function) =
+NHCovid_df_county_delta_death = function(data, i, c) {
+  
+  if (i < 6) {
+    delta = data %>% ungroup() %>%
+      filter(county == c, month = 5) %>% 
+      select(residents_covid19_deaths_per_month) %>% 
+      as.numeric()
+    
+    delta
+  }
+  
+  if (i >= 6) {
+    death_mo_i = data %>% ungroup() %>%
+      filter(county == c, month = i) %>% 
+      select(residents_covid19_deaths_per_month) %>% 
+      as.numeric()
+
+    death_mo_i_1 = data %>% ungroup() %>%
+      filter(county == c, month = i - 1) %>% 
+      select(residents_covid19_deaths_per_month) %>% 
+      as.numeric
+    
+    delta = death_mo_i - death_mo_i_1
+    delta
+  }
+}
+output = purrr::map(NHCovid_df_mortality, NHCovid_df_county_delta_death)
+
+
 
 #plot
 monthly_death_plot =
@@ -74,11 +125,12 @@ monthly_death_plot
 ```{r}
 #data
 NHCovid_df_county_monthly_confirmed = 
-  NHCovid_df_by_month %>% 
+  NHCovid_df_by_day %>% 
   # to eliminate N/A, filter by submitted data and quality check
   filter(submitted_data == "Y") %>% 
   group_by(month, county) %>% 
-  summarise(residents_covid19_cases_per_month =  sum(residents_weekly_confirmed_covid_19)) %>% drop_na()
+  summarise(residents_covid19_cases_per_month =  sum(residents_total_confirmed_covid_19)) %>% 
+  drop_na()
 
 #plot
 monthly_confirmed_plot =
@@ -109,8 +161,66 @@ monthly_mortality_plot
 
 ```
 
+# Summarize using Total Resident Confirmed/Deaths COVID-19 Cases Per 1,000 Residents
 
-combine shortage of stuff
+```{r}
+# data (Summarize monthly death)
+NHCovid_df_county_monthly_death_2 =
+  NHCovid_df_by_day %>% 
+  # to eliminate N/A, filter by submitted data and quality check
+  filter(submitted_data == "Y") %>% 
+  group_by(month, county) %>% 
+  summarise(residents_covid19_deaths_per_month = sum(total_resident_covid_19_deaths_per_1_000_residents)) %>% 
+  drop_na()
+ 
+#plot
+monthly_death_plot =
+ggplot(NHCovid_df_county_monthly_death_2, aes(x = county, y = residents_covid19_deaths_per_month, color = month)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+monthly_death_plot
+```
+
+```{r}
+#data
+NHCovid_df_county_monthly_confirmed_2 = 
+  NHCovid_df_by_day %>% 
+  # to eliminate N/A, filter by submitted data and quality check
+  filter(submitted_data == "Y") %>% 
+  group_by(month, county) %>% 
+  summarise(residents_covid19_cases_per_month =  sum(total_resident_confirmed_covid_19_cases_per_1_000_residents)) %>% 
+  drop_na()
+
+#plot
+monthly_confirmed_plot =
+ggplot(NHCovid_df_county_monthly_confirmed_2, aes(x = county, y = residents_covid19_cases_per_month, color = month)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+monthly_confirmed_plot
+```
+
+```{r}
+#data
+NHCovid_df_mortality_2 = 
+  left_join(NHCovid_df_county_monthly_death_2, NHCovid_df_county_monthly_confirmed_2, by = c("county", "month")) %>% 
+  mutate(mortality = residents_covid19_deaths_per_month/residents_covid19_cases_per_month) %>% 
+  drop_na()
+
+#plot
+monthly_mortality_plot =
+ggplot(NHCovid_df_mortality, aes(x = county, y = mortality, color = month)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+monthly_mortality_plot
+```
+
+# Combine shortage of stuff
 ```{r}
 #data
 shortage_of_stuff =
@@ -135,5 +245,36 @@ ggplot(shortage_of_stuff, aes(x = county, y = month, color = month)) +
   theme(legend.position = "right") 
 
 shortage_of_stuff_plot
+```
+
+# NH occupancy rate
+
+```{r}
+NH_occupancy_rate = 
+  NHCovid_df_by_month %>%
+  select(month, day, provider_name, county, total_number_of_occupied_beds, number_of_all_beds) %>% 
+  mutate(occupancy_rate =
+           total_number_of_occupied_beds/number_of_all_beds) %>% 
+  group_by(month, county) %>% 
+  summarize(
+    occupancy_rate = mean(occupancy_rate)) %>% 
+  drop_na()
+
+write_csv(NH_occupancy_rate, path = "./NH_occupancy_rate.csv")
+```
+
+# NH monthly prevalence of Covid-19
+
+```{r}
+NH_monthly_prevalence =
+  NHCovid_df_by_day %>% 
+  select(month, day, county, total_number_of_occupied_beds, residents_total_confirmed_covid_19) %>% 
+  drop_na() %>% 
+  group_by(month, county) %>% 
+  mutate(
+    county_occupancy = sum(total_number_of_occupied_beds),
+    county_cases = sum(residents_total_confirmed_covid_19),
+    county_prevalence = county_cases/county_occupancy
+    ) 
 ```
 
