@@ -7,14 +7,14 @@ Minjie Bao
 library(tidyverse)
 ```
 
-    ## ── Attaching packages ────────────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
 
     ## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
-    ## ✓ tibble  3.0.3     ✓ dplyr   1.0.2
+    ## ✓ tibble  3.0.4     ✓ dplyr   1.0.2
     ## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
-    ## ✓ readr   1.3.1     ✓ forcats 0.5.0
+    ## ✓ readr   1.4.0     ✓ forcats 0.5.0
 
-    ## ── Conflicts ───────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -43,7 +43,8 @@ NHCovid_df =
   filter(provider_state == "NY")
 ```
 
-    ## Parsed with column specification:
+    ## 
+    ## ── Column specification ────────────────────────────────────────────────────────
     ## cols(
     ##   .default = col_character(),
     ##   `Provider Zip Code` = col_double(),
@@ -68,8 +69,7 @@ NHCovid_df =
     ##   `Staff Weekly COVID-19 Deaths` = col_double()
     ##   # ... with 8 more columns
     ## )
-
-    ## See spec(...) for full column specifications.
+    ## ℹ Use `spec()` for the full column specifications.
 
     ## Warning: 40533 parsing failures.
     ##  row                                       col           expected actual                                                                           file
@@ -87,7 +87,8 @@ nystate_df =
   janitor::clean_names() %>% view()
 ```
 
-    ## Parsed with column specification:
+    ## 
+    ## ── Column specification ────────────────────────────────────────────────────────
     ## cols(
     ##   .default = col_double(),
     ##   `Week Ending` = col_character(),
@@ -107,15 +108,15 @@ nystate_df =
     ##   `One-Week Supply of Ventilator Supplies` = col_character(),
     ##   County = col_character()
     ## )
-    ## See spec(...) for full column specifications.
+    ## ℹ Use `spec()` for the full column specifications.
 
     ## Warning: 46 parsing failures.
     ##   row                     col               expected actual                 file
-    ## 14137 Federal Provider Number no trailing characters   A081 './Data/nystate.csv'
-    ## 14138 Federal Provider Number no trailing characters   A081 './Data/nystate.csv'
-    ## 14139 Federal Provider Number no trailing characters   A081 './Data/nystate.csv'
-    ## 14140 Federal Provider Number no trailing characters   A081 './Data/nystate.csv'
-    ## 14141 Federal Provider Number no trailing characters   A081 './Data/nystate.csv'
+    ## 14137 Federal Provider Number no trailing characters 33A081 './Data/nystate.csv'
+    ## 14138 Federal Provider Number no trailing characters 33A081 './Data/nystate.csv'
+    ## 14139 Federal Provider Number no trailing characters 33A081 './Data/nystate.csv'
+    ## 14140 Federal Provider Number no trailing characters 33A081 './Data/nystate.csv'
+    ## 14141 Federal Provider Number no trailing characters 33A081 './Data/nystate.csv'
     ## ..... ....................... ...................... ...... ....................
     ## See problems(...) for more details.
 
@@ -154,7 +155,11 @@ ggplot(NHCovid_df_county_monthly_death, aes(x = county, y = residents_covid19_de
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+
+monthly_death_plot
 ```
+
+<img src="Minjie_files/figure-gfm/unnamed-chunk-4-1.png" width="90%" />
 
 ``` r
 #data
@@ -175,7 +180,11 @@ ggplot(NHCovid_df_county_monthly_confirmed, aes(x = county, y = residents_covid1
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+
+monthly_confirmed_plot
 ```
+
+<img src="Minjie_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
 
 ``` r
 #data
@@ -190,7 +199,11 @@ ggplot(NHCovid_df_mortality, aes(x = county, y = mortality, color = month)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+
+monthly_mortality_plot
 ```
+
+<img src="Minjie_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
 
 combine shortage of stuff
 
@@ -216,4 +229,8 @@ ggplot(shortage_of_stuff, aes(x = county, y = month, color = month)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+
+shortage_of_stuff_plot
 ```
+
+<img src="Minjie_files/figure-gfm/unnamed-chunk-7-1.png" width="90%" />

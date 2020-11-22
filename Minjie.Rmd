@@ -71,6 +71,8 @@ ggplot(NHCovid_df_county_monthly_death, aes(x = county, y = residents_covid19_de
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+
+monthly_death_plot
 ```
 
 
@@ -89,6 +91,8 @@ ggplot(NHCovid_df_county_monthly_confirmed, aes(x = county, y = residents_covid1
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+
+monthly_confirmed_plot
 ```
 
 
@@ -105,6 +109,9 @@ ggplot(NHCovid_df_mortality, aes(x = county, y = mortality, color = month)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+
+monthly_mortality_plot
+
 ```
 
 
@@ -131,5 +138,7 @@ ggplot(shortage_of_stuff, aes(x = county, y = month, color = month)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+
+shortage_of_stuff_plot
 ```
 
