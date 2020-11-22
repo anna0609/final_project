@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(plotly)
 ```
 
 
@@ -76,11 +77,73 @@ ny_statewide_data =
   read.csv("./New_York_State_Statewide_COVID-19_Testing.csv") %>% 
   janitor::clean_names() 
 
+# join death_pop data into test data
 ny_state_test_pop_mor = 
   left_join(ny_statewide_data, death_pop, by = c("test_date","county")) %>% 
   mutate(
-    mortality_rate = cummulative_death / cumulative_number_of_positives
-  )
+    mortality_rate = cummulative_death / cumulative_number_of_positives, 
+    test_date = as.Date(test_date, "%m/%d/%y"),
+    month = months(test_date),
+    year = format(test_date, format = "%y"),
+  ) 
+
+# visualize daily fatality rate
+daily_fatal_plot1 = 
+  ny_state_test_pop_mor %>% 
+  ggplot(aes(test_date, mortality_rate, group = county)) +
+  geom_line(stat = "identity", aes(color = county)) + 
+  theme_light() +
+  scale_x_date(name = "date", date_breaks = "1 month")
+
+daily_fatal_plot1 =
+  daily_fatal_plot1 %>% 
+  ggplotly()
+```
+
+
+## 3. Data formating: aggregte daily data to monthly data
+
+```{r ny_state_monthly_testpopmor}
+
+# aggregate cummulative variables by taking maximum() for monthly data
+ny_month_df1 = 
+  aggregate(
+    cbind(cumulative_number_of_positives, 
+          cummulative_death,
+          cumulative_number_of_tests_performed) 
+    ~ month + county, 
+    ny_state_test_pop_mor, 
+    max) %>% 
+    mutate(
+      month_fatal = cummulative_death / cumulative_number_of_positives
+    )
+
+# aggregate incremental variables by taking sum() for montly data
+ny_month_df2 = 
+  aggregate(
+    cbind(new_positives, 
+          total_number_of_tests_performed,
+          population)
+    ~month + county,
+    ny_state_test_pop_mor,
+    sum) 
+
+# combine 2 dfs, complete monthly data for fatality rate
+ny_state_monthly_testpopmor = 
+  left_join(ny_month_df1, ny_month_df2, by = c("month", "county"))
+
+# manipulation for variables
+
+# visualization monthly fatality rate in each state, by each month
+monthly_fatal_plot1 = 
+  ny_state_monthly_testpopmor %>% 
+  ggplot(aes(month, month_fatal, group = county)) +
+  geom_line(aes(color = county))+
+  theme_light() 
+
+monthly_fatal_plot1 =
+  monthly_fatal_plot1 %>% 
+  ggplotly()
 
 ```
 
