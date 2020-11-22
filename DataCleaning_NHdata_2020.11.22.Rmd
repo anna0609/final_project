@@ -1,0 +1,139 @@
+---
+title: "Nursing home data edit"
+author: Minjie Bao
+date: 2020-11-19
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+theme_set(theme_minimal() +  theme(legend.position = "bottom"))
+
+options(
+  ggplots2.continuous.color = "viridis",
+  ggplots2.continuous.fill = "viridus"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+```{r}
+# Read in Covid Nursing Home data and filter data from only NY state
+NHCovid_df = 
+  read_csv("./Data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv") %>% 
+  janitor::clean_names() %>% 
+  filter(provider_state == "NY")
+```
+
+
+```{r}
+# Break down specific date into month
+NHCovid_df_by_month = 
+  NHCovid_df %>% 
+  separate(week_ending, into = c("month", "day", "year"), sep = "/") %>% 
+  mutate(
+    month = factor(month, levels = c("05", "06", "07", "08", "09", "10")),
+    month = str_replace(month, "05", "5"),
+    month = str_replace(month, "06", "6"),
+    month = str_replace(month, "07", "7"),
+    month = str_replace(month, "08", "8"),
+    month = str_replace(month, "09", "9"),
+    )
+```
+
+
+```{r}
+# data (Summarize monthly death)
+NHCovid_df_county_monthly_death =
+  NHCovid_df_by_month %>% 
+  # to eliminate N/A, filter by submitted data and quality check
+  filter(submitted_data == "Y") %>% 
+  group_by(month, county) %>% 
+  summarise(residents_covid19_deaths_per_month = sum(residents_weekly_covid_19_deaths)) %>% 
+  drop_na()
+
+#plot
+monthly_death_plot =
+ggplot(NHCovid_df_county_monthly_death, aes(x = county, y = residents_covid19_deaths_per_month, color = month)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+monthly_death_plot
+```
+
+
+```{r}
+#data
+NHCovid_df_county_monthly_confirmed = 
+  NHCovid_df_by_month %>% 
+  # to eliminate N/A, filter by submitted data and quality check
+  filter(submitted_data == "Y") %>% 
+  group_by(month, county) %>% 
+  summarise(residents_covid19_cases_per_month =  sum(residents_weekly_confirmed_covid_19)) %>% drop_na()
+
+#plot
+monthly_confirmed_plot =
+ggplot(NHCovid_df_county_monthly_confirmed, aes(x = county, y = residents_covid19_cases_per_month, color = month)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+monthly_confirmed_plot
+```
+
+
+```{r}
+#data
+NHCovid_df_mortality = 
+  left_join(NHCovid_df_county_monthly_death, NHCovid_df_county_monthly_confirmed, by = c("county", "month")) %>% 
+  mutate(mortality = residents_covid19_deaths_per_month/residents_covid19_cases_per_month) %>% 
+  drop_na()
+
+#plot
+monthly_mortality_plot =
+ggplot(NHCovid_df_mortality, aes(x = county, y = mortality, color = month)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+monthly_mortality_plot
+
+```
+
+
+combine shortage of stuff
+```{r}
+#data
+shortage_of_stuff =
+NHCovid_df_by_month %>% 
+  filter(submitted_data == "Y") %>% 
+  select(month, county, starts_with("shortage")) %>% 
+    mutate(
+     total_shortage = case_when(
+      shortage_of_nursing_staff != "N" ~ "Y",
+      shortage_of_clinical_staff != "N" ~ "Y",
+      shortage_of_aides != "N" ~ "Y",
+      shortage_of_other_staff != "N" ~ "Y"
+    )
+  ) %>% 
+  drop_na()
+
+#plot
+shortage_of_stuff_plot =
+ggplot(shortage_of_stuff, aes(x = county, y = month, color = month)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+shortage_of_stuff_plot
+```
+
