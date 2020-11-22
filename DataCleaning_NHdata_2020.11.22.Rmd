@@ -7,6 +7,8 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+library(readr)
+library(plotly)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -24,7 +26,9 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
-# Read in Nursing Home raw data and filter data from NY only
+# 1. Data import 
+
+## 1.1 Read in Nursing Home raw data, filter by month or filter by day of the last week of month
 
 ```{r}
 # Read in Covid Nursing Home data and filter data from only NY state
@@ -33,18 +37,6 @@ NHCovid_df =
   janitor::clean_names() %>% 
   filter(provider_state == "NY")
 
-# Read in facility info data
-NH_NY_Facility = 
-  read_csv("./Data/NH_20Profiles/FACILITY_INFO.csv") %>% 
-  janitor::clean_names() %>% 
-  group_by(county) %>% 
-  summarize(
-    employee_flu_vaccination_rate = mean(employee_flu_vaccination_rate)
-  )
-```
-
-
-```{r}
 # Break down specific date into month, day, year
 NHCovid_df_by_month = 
   NHCovid_df %>% 
@@ -67,7 +59,25 @@ NHCovid_df_by_day =
   filter(day > 24)
 ```
 
-# Summarize using residents total covid-19 confirmed and deaths number
+# 1.2 Read in NY Nursing Home Facility Info; Calculate mean staff flu vaccination rate of each county
+
+```{r}
+# Read in facility info data
+NH_staff_flu_vaccination_rate = 
+  read_csv("./Data/NH_20Profiles/FACILITY_INFO.csv") %>% 
+  janitor::clean_names() %>%
+# Combined employee flu vaccination rate by taking the mean value from the same county
+  group_by(county) %>% 
+  summarize(
+    staff_flu_vaccination_rate = mean(employee_flu_vaccination_rate)
+  )
+
+write_csv(NH_staff_flu_vaccination_rate, path = "./NH_staff_flu_vaccination_rate.csv")
+```
+
+# 2. Data Cleaning
+
+# 2.1 Summarize using "residents total covid-19 confirmed and deaths number"
 
 ```{r}
 # data (Summarize monthly death)
@@ -78,37 +88,6 @@ NHCovid_df_county_monthly_death =
   group_by(month, county) %>% 
   summarise(residents_covid19_deaths_per_month = sum(residents_total_covid_19_deaths)) %>% 
   drop_na()
-
-# data (summarize monthly death by function) =
-NHCovid_df_county_delta_death = function(data, i, c) {
-  
-  if (i < 6) {
-    delta = data %>% ungroup() %>%
-      filter(county == c, month = 5) %>% 
-      select(residents_covid19_deaths_per_month) %>% 
-      as.numeric()
-    
-    delta
-  }
-  
-  if (i >= 6) {
-    death_mo_i = data %>% ungroup() %>%
-      filter(county == c, month = i) %>% 
-      select(residents_covid19_deaths_per_month) %>% 
-      as.numeric()
-
-    death_mo_i_1 = data %>% ungroup() %>%
-      filter(county == c, month = i - 1) %>% 
-      select(residents_covid19_deaths_per_month) %>% 
-      as.numeric
-    
-    delta = death_mo_i - death_mo_i_1
-    delta
-  }
-}
-output = purrr::map(NHCovid_df_mortality, NHCovid_df_county_delta_death)
-
-
 
 #plot
 monthly_death_plot =
@@ -122,7 +101,7 @@ monthly_death_plot
 
 
 ```{r}
-#data
+#data (Summarize monthly cases)
 NHCovid_df_county_monthly_confirmed = 
   NHCovid_df_by_day %>% 
   # to eliminate N/A, filter by submitted data and quality check
@@ -275,5 +254,38 @@ NH_monthly_prevalence =
     county_cases = sum(residents_total_confirmed_covid_19),
     county_prevalence = county_cases/county_occupancy
     ) 
+```
+
+# Functions set up to reveal the actual increment of cases and deaths by month
+
+```{r}
+# data (summarize monthly death by function)
+NHCovid_df_county_delta_death = function(data, i, c) {
+  
+  if (i < 6) {
+    delta = data %>% ungroup() %>%
+      filter(county == c, month = 5) %>% 
+      select(residents_covid19_deaths_per_month) %>% 
+      as.numeric()
+    
+    delta
+  }
+  
+  if (i >= 6) {
+    death_mo_i = data %>% ungroup() %>%
+      filter(county == c, month = i) %>% 
+      select(residents_covid19_deaths_per_month) %>% 
+      as.numeric()
+
+    death_mo_i_1 = data %>% ungroup() %>%
+      filter(county == c, month = i - 1) %>% 
+      select(residents_covid19_deaths_per_month) %>% 
+      as.numeric
+    
+    delta = death_mo_i - death_mo_i_1
+    delta
+  }
+}
+output = purrr::map(NHCovid_df_mortality, NHCovid_df_county_delta_death)
 ```
 
