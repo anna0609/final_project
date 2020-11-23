@@ -1,0 +1,22 @@
+name: "Yay internet!"
+output_dir: "."
+navbar:
+  title: "Home"
+  right:
+    - text: "About"
+      href: about.html
+    - text: "Overview"
+      href: overview.html
+    - text: "Nusing Home Trends"
+      href: dashboard.html
+    - text: "Analysis"
+      href: analysis.html
+    - text: "Fun Explorations"
+      href: more.html
+    - icon: fa-envelope fa-lg
+      href: mailto:<mb4757@cumc.columbia.edu>
+    - icon: fa-github fa-lg
+      href: https://github.com/anna0609/final_project.git/
+output:
+  html_document:
+    theme: yeti
