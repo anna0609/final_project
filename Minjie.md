@@ -372,5 +372,5 @@ ggplot(aes(x = county, y = month, color = month)) +
 
 ``` r
 regression_df =
-left_join(shortage_of_stuff, supply_of_ppe, by = c("month","county")) 
+left_join(supply_of_ppe, shortage_of_stuff, by = c("county","month")) 
 ```
