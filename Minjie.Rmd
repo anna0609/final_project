@@ -9,6 +9,7 @@ output: github_document
 library(tidyverse)
 library(readr)
 library(plotly)
+library(gapminder)
 knitr::opts_chunk$set(
   fig.width = 6,
   fig.asp = .6,
@@ -46,7 +47,8 @@ NHCovid_df_by_month =
     month = str_replace(month, "09", "9"),
   ) %>% 
   mutate(
-    day = as.numeric(day)
+    day = as.numeric(day),
+    month = as.numeric(month)
   )  
 # Filter by day to get monthly cases and deaths
 NHCovid_df_by_day =
@@ -245,14 +247,14 @@ write_csv(NH_monthly_prevalence, path = "./NH_monthly_prevalence.csv")
 ```
 
 
-## 2.6 Combine shortage of stuff
+## 2.6.1 Combine weekly shortage of stuff
 
 ```{r, message=FALSE}
 #data
 shortage_of_stuff =
 NHCovid_df_by_month %>% 
   filter(submitted_data == "Y") %>% 
-  select(month, county, starts_with("shortage")) %>% 
+  select(month, day, county, starts_with("shortage")) %>% 
     mutate(
      total_shortage_stuff = case_when(
       shortage_of_nursing_staff != "N"  ~ 1,
@@ -260,8 +262,8 @@ NHCovid_df_by_month %>%
       shortage_of_aides != "N"          ~ 1,
       shortage_of_other_staff != "N"    ~ 1)) %>% 
 replace_na(list(total_shortage_stuff = 0)) %>% 
-  select(month, county, total_shortage_stuff)
-
+  select(month, day, county, total_shortage_stuff)
+  
 #plot
 shortage_of_stuff_plot =
   shortage_of_stuff %>% 
@@ -273,13 +275,25 @@ ggplot(aes(x = county, y = month, color = month)) +
 shortage_of_stuff_plot
 ```
 
+## 2.6.1 convert weekly shortage of stuff to monthly
+
+```{r}
+monthly_shortage_of_stuff = 
+shortage_of_stuff %>% 
+  group_by(month, county) %>% 
+  summarise(
+    total_shortage_stuff_month = sum(total_shortage_stuff)
+  )
+```
+
+
 ## 2.7 Combine one-week supply of ppe
 ```{r, message=FALSE}
 #data
 supply_of_ppe =
 NHCovid_df_by_month %>% 
   filter(submitted_data == "Y") %>% 
-  select(month, county, starts_with("one_week_supply"), -one_week_supply_of_ventilator_supplies) %>% 
+  select(month, county, day, starts_with("one_week_supply"), -one_week_supply_of_ventilator_supplies) %>% 
     mutate(
      total_supply_ppe = case_when(
       one_week_supply_of_n95_masks      != "N" ~ 1,
@@ -289,7 +303,7 @@ NHCovid_df_by_month %>%
       one_week_supply_of_gloves         != "N" ~ 1,
       one_week_supply_of_hand_sanitizer != "N" ~ 1)) %>% 
 replace_na(list(total_supply_ppe = 0)) %>% 
-  select(month, county, total_supply_ppe)
+  select(month, day, county, total_supply_ppe)
 
 #supply_of_ppe %>% 
 #  filter(total_supply_ppe == 0) only 105/13983, very small portion didn't have weekly supply
@@ -306,21 +320,33 @@ ggplot(aes(x = county, y = month, color = month)) +
 
 
 ## 2.8 Ventilator supply
-```{r, error=TRUE}
-#data
-supply_of_ventilator =
-NHCovid_df_by_month %>% 
-  filter(submitted_data == "Y") %>% 
-  select(month, county, one_week_supply_of_ventilator_supplies) %>% 
-    mutate(
-      one_week_supply_of_ventilator_supplies = fct_recode(one_week_supply_of_ventilator_supplies, Y = "1", N = "0"))
 
+```{r}
+nystate_df = 
+  read_csv("./Data/nystate.csv") %>% 
+  janitor::clean_names() %>% 
+  separate(week_ending, into = c("month", "day", "year"), sep = "/") %>% 
+  mutate(
+    month = as.numeric(month)
+  ) %>% 
+  mutate(
+    day = as.numeric(day)
+  )  
+
+nystate_df %>% 
+  filter(submitted_data == "Y") %>% 
+   select(month, day, county, one_week_supply_of_ventilator_supplies) %>% 
+  mutate(
+    one_week_supply_of_ventilator_supplies = str_replace(one_week_supply_of_ventilator_supplies, "N", 0)
+  )
+  
 ```
+
 
 ## 2.9  Merge regression data
 ```{r}
 regression_df =
-left_join(supply_of_ppe, shortage_of_stuff, by = c("county","month")) 
+left_join(supply_of_ppe, shortage_of_stuff, by = c("county", "month")) 
 ```
 
 
