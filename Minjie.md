@@ -345,28 +345,12 @@ NHCovid_df_by_month %>%
   filter(submitted_data == "Y") %>% 
   select(month, county, one_week_supply_of_ventilator_supplies) %>% 
     mutate(
-     total_supply_ventilator = str_replace(one_week_supply_of_ventilator_supplies, "Y", "1")) %>% 
-replace_na(list(total_supply_ventilator = 0)) %>% 
-  select(month, county, total_supply_ventilator) %>% 
-  filter(total_supply_ventilator == "1")
-
-supply_of_ventilator %>% 
-  filter(total_supply_ventilator == 1) 
+      one_week_supply_of_ventilator_supplies = fct_recode(one_week_supply_of_ventilator_supplies, Y = "1", N = "0"))
 ```
 
-    ## # A tibble: 0 x 3
-    ## # … with 3 variables: month <chr>, county <chr>, total_supply_ventilator <chr>
-
-``` r
-#plot
-supply_of_ventilator_plot =
-  supply_of_ventilator %>% 
-  filter(total_supply_ventilator == 1) %>% 
-ggplot(aes(x = county, y = month, color = month)) +
-  geom_point() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  theme(legend.position = "right") 
-```
+    ## Error: Problem with `mutate()` input `one_week_supply_of_ventilator_supplies`.
+    ## x `f` must be a factor (or character vector).
+    ## ℹ Input `one_week_supply_of_ventilator_supplies` is `fct_recode(one_week_supply_of_ventilator_supplies, Y = "1", N = "0")`.
 
 ## 2.9 Merge regression data
 
