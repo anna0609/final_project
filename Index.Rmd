@@ -65,10 +65,10 @@ counties_ny = testing_df %>%
 
 infection_rate_results = 
   tibble(
-    county_name = counties_ny
+    county = counties_ny
   ) %>% 
   mutate(
-    output_lists = map(.x = county_name, ~ monthly_infection_rate(.x)),
+    output_lists = map(.x = county, ~ monthly_infection_rate(.x)),
     estimate_df = map(output_lists, bind_rows)
   ) %>% 
   select(-output_lists) %>% 
@@ -77,10 +77,38 @@ infection_rate_results =
 infection_rate_results
 
 infection_rate_results %>%
-  ggplot(aes(month, monthly_infection_rate, color = county_name)) +
+  ggplot(aes(month, monthly_infection_rate, color = county)) +
   geom_line()
 ```
 
+```{r}
+fatality_rate_results =
+  read_csv("./data/ny_state_bymonth_testpopmor.csv") %>%
+  janitor::clean_names() %>%
+  select(c(month, county, month_fatal)) %>%
+  mutate(month = recode(
+    month,
+    "March" = "2020-03-01",
+    "April" = "2020-04-01",
+    "May" = "2020-05-01",
+    "June" = "2020-06-01",
+    "July" = "2020-07-01",
+    "August" = "2020-08-01",
+    "September" = "2020-09-01",
+    "October" = "2020-10-01",
+    "November" = "2020-11-01"
+  )) %>%
+  transform(month = as.Date(month)) %>%
+  arrange(county, month)
+
+merged_df = left_join(infection_rate_results, fatality_rate_results, by = c("county","month")) %>%
+  rename(monthly_fatality_rate = month_fatal)
+
+write.csv(merged_df, file = "merged_df.csv", quote = FALSE, row.names = F) 
+```
+
+
+-----------------------------------
 
 ## New York Covid-19 Nursing home data
 
