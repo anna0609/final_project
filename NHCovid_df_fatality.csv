@@ -10,9 +10,11 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 10,Clinton,0,1,0
 10,Columbia,21,69,0.30434782608695654
 10,Cortland,0,4,0
+10,Delaware,0,0,NA
 10,Dutchess,22,85,0.25882352941176473
 10,Erie,317,1344,0.23586309523809523
 10,Essex,10,62,0.16129032258064516
+10,Franklin,0,0,NA
 10,Fulton,29,158,0.18354430379746836
 10,Genesee,0,6,0
 10,Greene,14,91,0.15384615384615385
@@ -33,6 +35,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 10,Orange,169,440,0.3840909090909091
 10,Orleans,39,97,0.4020618556701031
 10,Oswego,0,1,0
+10,Otsego,0,0,NA
 10,Putnam,4,29,0.13793103448275862
 10,Queens,518,1329,0.3897667419112114
 10,Rensselaer,23,63,0.36507936507936506
@@ -41,6 +44,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 10,Saratoga,0,1,0
 10,Schenectady,3,16,0.1875
 10,Schuyler,0,8,0
+10,Seneca,0,0,NA
 10,St. Lawrence,0,1,0
 10,Steuben,42,123,0.34146341463414637
 10,Suffolk,554,1463,0.37867395762132605
@@ -55,16 +59,28 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 10,Wyoming,0,3,0
 10,Yates,9,15,0.6
 5,Albany,42,130,0.3230769230769231
+5,Allegany,0,0,NA
 5,Bronx,594,786,0.7557251908396947
 5,Broome,21,93,0.22580645161290322
+5,Cattaraugus,0,0,NA
+5,Cayuga,0,0,NA
+5,Chautauqua,0,0,NA
 5,Chenango,0,4,0
+5,Clinton,0,0,NA
 5,Columbia,15,36,0.4166666666666667
+5,Cortland,0,0,NA
+5,Delaware,0,0,NA
 5,Dutchess,39,123,0.3170731707317073
 5,Erie,211,782,0.26982097186700765
 5,Essex,0,1,0
+5,Franklin,0,0,NA
 5,Fulton,17,94,0.18085106382978725
+5,Genesee,0,0,NA
 5,Greene,14,90,0.15555555555555556
+5,Herkimer,0,0,NA
+5,Jefferson,0,0,NA
 5,Kings,418,851,0.491186839012926
+5,Lewis,0,0,NA
 5,Livingston,2,4,0.5
 5,Madison,1,29,0.034482758620689655
 5,Monroe,102,404,0.2524752475247525
@@ -78,6 +94,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 5,Orange,149,390,0.382051282051282
 5,Orleans,25,85,0.29411764705882354
 5,Oswego,0,1,0
+5,Otsego,0,0,NA
 5,Putnam,3,22,0.13636363636363635
 5,Queens,510,914,0.5579868708971554
 5,Rensselaer,17,18,0.9444444444444444
@@ -85,31 +102,44 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 5,Rockland,26,87,0.2988505747126437
 5,Saratoga,0,1,0
 5,Schenectady,0,1,0
+5,Schuyler,0,0,NA
+5,Seneca,0,0,NA
 5,St. Lawrence,0,1,0
 5,Steuben,13,27,0.48148148148148145
 5,Suffolk,534,1325,0.4030188679245283
 5,Sullivan,5,96,0.052083333333333336
 5,Tioga,21,65,0.3230769230769231
+5,Tompkins,0,0,NA
 5,Ulster,40,118,0.3389830508474576
 5,Warren,19,51,0.37254901960784315
 5,Washington,6,0,Inf
+5,Wayne,0,0,NA
 5,Westchester,112,626,0.17891373801916932
 5,Wyoming,0,3,0
 5,Yates,8,15,0.5333333333333333
 6,Albany,44,137,0.32116788321167883
+6,Allegany,0,0,NA
 6,Bronx,637,1327,0.4800301431801055
 6,Broome,30,131,0.22900763358778625
 6,Cattaraugus,0,1,0
+6,Cayuga,0,0,NA
 6,Chautauqua,0,1,0
 6,Chenango,0,4,0
+6,Clinton,0,0,NA
 6,Columbia,21,67,0.31343283582089554
+6,Cortland,0,0,NA
+6,Delaware,0,0,NA
 6,Dutchess,42,126,0.3333333333333333
 6,Erie,277,1113,0.24887690925426775
 6,Essex,0,1,0
+6,Franklin,0,0,NA
 6,Fulton,27,125,0.216
 6,Genesee,0,1,0
 6,Greene,14,90,0.15555555555555556
+6,Herkimer,0,0,NA
+6,Jefferson,0,0,NA
 6,Kings,440,1106,0.39783001808318263
+6,Lewis,0,0,NA
 6,Livingston,2,4,0.5
 6,Madison,1,29,0.034482758620689655
 6,Monroe,134,434,0.3087557603686636
@@ -123,6 +153,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 6,Orange,149,420,0.3547619047619048
 6,Orleans,39,97,0.4020618556701031
 6,Oswego,0,1,0
+6,Otsego,0,0,NA
 6,Putnam,3,25,0.12
 6,Queens,531,1219,0.43560295324036097
 6,Rensselaer,20,21,0.9523809523809523
@@ -130,11 +161,14 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 6,Rockland,34,119,0.2857142857142857
 6,Saratoga,0,1,0
 6,Schenectady,2,5,0.4
+6,Schuyler,0,0,NA
+6,Seneca,0,0,NA
 6,St. Lawrence,0,1,0
 6,Steuben,13,29,0.4482758620689655
 6,Suffolk,585,1486,0.3936742934051144
 6,Sullivan,6,158,0.0379746835443038
 6,Tioga,22,69,0.3188405797101449
+6,Tompkins,0,0,NA
 6,Ulster,41,118,0.3474576271186441
 6,Warren,21,55,0.38181818181818183
 6,Washington,6,0,Inf
@@ -143,6 +177,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 6,Wyoming,0,3,0
 6,Yates,8,15,0.5333333333333333
 7,Albany,50,155,0.3225806451612903
+7,Allegany,0,0,NA
 7,Bronx,727,1357,0.5357406042741342
 7,Broome,38,182,0.2087912087912088
 7,Cattaraugus,0,1,0
@@ -152,15 +187,18 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 7,Clinton,0,1,0
 7,Columbia,21,68,0.3088235294117647
 7,Cortland,0,1,0
+7,Delaware,0,0,NA
 7,Dutchess,43,129,0.3333333333333333
 7,Erie,287,1170,0.2452991452991453
 7,Essex,0,1,0
+7,Franklin,0,0,NA
 7,Fulton,28,150,0.18666666666666668
 7,Genesee,0,1,0
 7,Greene,14,91,0.15384615384615385
 7,Herkimer,0,2,0
 7,Jefferson,0,1,0
 7,Kings,440,1136,0.3873239436619718
+7,Lewis,0,0,NA
 7,Livingston,2,5,0.4
 7,Madison,1,29,0.034482758620689655
 7,Monroe,137,436,0.31422018348623854
@@ -174,6 +212,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 7,Orange,154,430,0.3581395348837209
 7,Orleans,39,97,0.4020618556701031
 7,Oswego,0,1,0
+7,Otsego,0,0,NA
 7,Putnam,4,25,0.16
 7,Queens,571,1293,0.44160866202629545
 7,Rensselaer,22,103,0.21359223300970873
@@ -181,6 +220,8 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 7,Rockland,35,123,0.2845528455284553
 7,Saratoga,0,1,0
 7,Schenectady,2,7,0.2857142857142857
+7,Schuyler,0,0,NA
+7,Seneca,0,0,NA
 7,St. Lawrence,0,1,0
 7,Steuben,13,29,0.4482758620689655
 7,Suffolk,594,1523,0.39001969796454367
@@ -195,6 +236,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 7,Wyoming,0,3,0
 7,Yates,8,15,0.5333333333333333
 8,Albany,56,164,0.34146341463414637
+8,Allegany,0,0,NA
 8,Bronx,731,1368,0.5343567251461988
 8,Broome,50,207,0.24154589371980675
 8,Cattaraugus,0,2,0
@@ -204,15 +246,18 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 8,Clinton,0,1,0
 8,Columbia,21,69,0.30434782608695654
 8,Cortland,0,4,0
+8,Delaware,0,0,NA
 8,Dutchess,43,131,0.3282442748091603
 8,Erie,293,1197,0.24477861319966582
 8,Essex,2,40,0.05
+8,Franklin,0,0,NA
 8,Fulton,29,158,0.18354430379746836
 8,Genesee,0,1,0
 8,Greene,14,91,0.15384615384615385
 8,Herkimer,6,32,0.1875
 8,Jefferson,0,1,0
 8,Kings,441,1147,0.38448125544899736
+8,Lewis,0,0,NA
 8,Livingston,2,5,0.4
 8,Madison,1,30,0.03333333333333333
 8,Monroe,137,438,0.3127853881278539
@@ -226,6 +271,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 8,Orange,156,433,0.36027713625866054
 8,Orleans,39,97,0.4020618556701031
 8,Oswego,0,1,0
+8,Otsego,0,0,NA
 8,Putnam,4,25,0.16
 8,Queens,577,1337,0.43156320119670905
 8,Rensselaer,23,128,0.1796875
@@ -233,6 +279,8 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 8,Rockland,36,126,0.2857142857142857
 8,Saratoga,0,1,0
 8,Schenectady,3,11,0.2727272727272727
+8,Schuyler,0,0,NA
+8,Seneca,0,0,NA
 8,St. Lawrence,0,1,0
 8,Steuben,13,29,0.4482758620689655
 8,Suffolk,598,1539,0.3885640025990903
@@ -247,6 +295,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 8,Wyoming,0,3,0
 8,Yates,8,15,0.5333333333333333
 9,Albany,56,164,0.34146341463414637
+9,Allegany,0,0,NA
 9,Bronx,734,1382,0.5311143270622286
 9,Broome,51,207,0.2463768115942029
 9,Cattaraugus,0,3,0
@@ -256,9 +305,11 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 9,Clinton,0,1,0
 9,Columbia,21,69,0.30434782608695654
 9,Cortland,0,4,0
+9,Delaware,0,0,NA
 9,Dutchess,43,133,0.3233082706766917
 9,Erie,303,1192,0.25419463087248323
 9,Essex,9,62,0.14516129032258066
+9,Franklin,0,0,NA
 9,Fulton,29,158,0.18354430379746836
 9,Genesee,0,3,0
 9,Greene,14,91,0.15384615384615385
@@ -279,6 +330,7 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 9,Orange,169,435,0.38850574712643676
 9,Orleans,39,97,0.4020618556701031
 9,Oswego,0,1,0
+9,Otsego,0,0,NA
 9,Putnam,4,26,0.15384615384615385
 9,Queens,538,1298,0.41448382126348227
 9,Rensselaer,25,128,0.1953125
@@ -286,6 +338,8 @@ month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_mont
 9,Rockland,37,133,0.2781954887218045
 9,Saratoga,0,1,0
 9,Schenectady,3,15,0.2
+9,Schuyler,0,0,NA
+9,Seneca,0,0,NA
 9,St. Lawrence,0,1,0
 9,Steuben,13,67,0.19402985074626866
 9,Suffolk,598,1548,0.3863049095607235
