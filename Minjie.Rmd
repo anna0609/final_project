@@ -47,8 +47,7 @@ NHCovid_df_by_month =
     month = str_replace(month, "09", "9"),
   ) %>% 
   mutate(
-    day = as.numeric(day),
-    month = as.numeric(month)
+    day = as.numeric(day)
   )  
 # Filter by day to get monthly cases and deaths
 NHCovid_df_by_day =
@@ -264,30 +263,39 @@ NHCovid_df_by_month %>%
 replace_na(list(total_shortage_stuff = 0)) %>% 
   select(month, day, county, total_shortage_stuff)
   
-#plot
-shortage_of_stuff_plot =
-  shortage_of_stuff %>% 
-  filter(total_shortage_stuff == 1) %>% 
-ggplot(aes(x = county, y = month, color = month)) +
-  geom_point() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  theme(legend.position = "right") 
-shortage_of_stuff_plot
 ```
 
-## 2.6.1 convert weekly shortage of stuff to monthly
+## 2.6.2 convert weekly shortage of stuff to monthly
 
 ```{r}
 monthly_shortage_of_stuff = 
 shortage_of_stuff %>% 
+  mutate(month = as.numeric(month)) %>% 
   group_by(month, county) %>% 
   summarise(
     total_shortage_stuff_month = sum(total_shortage_stuff)
-  )
+  ) %>% 
+  mutate(
+   total_shortage_stuff_monthly = case_when(
+     total_shortage_stuff_month > 0  ~ 1
+   ) 
+  ) %>% 
+  replace_na(list(total_shortage_stuff_monthly = 0)) %>% 
+  select(month, county, total_shortage_stuff_monthly)
+
+#plot
+monthly_shortage_of_stuff_plot =
+  monthly_shortage_of_stuff %>% 
+  filter(total_shortage_stuff_monthly == 1) %>% 
+ggplot(aes(x = county, y = month, color = month)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+monthly_shortage_of_stuff_plot
 ```
 
 
-## 2.7 Combine one-week supply of ppe
+## 2.7.1 Combine one-week supply of ppe
 ```{r, message=FALSE}
 #data
 supply_of_ppe =
@@ -308,45 +316,82 @@ replace_na(list(total_supply_ppe = 0)) %>%
 #supply_of_ppe %>% 
 #  filter(total_supply_ppe == 0) only 105/13983, very small portion didn't have weekly supply
 
+```
+
+
+## 2.7.2 monthly supply of ppe
+
+```{r}
+monthly_supply_of_ppe = 
+supply_of_ppe %>% 
+  mutate(month = as.numeric(month)) %>% 
+  group_by(month, county) %>% 
+  summarise(
+    total_supply_ppe_month = sum(total_supply_ppe)
+  ) %>% 
+  mutate(
+   total_supply_ppe_monthly = case_when(
+     total_supply_ppe_month > 0  ~ 1
+   ) 
+  ) %>% 
+  replace_na(list(total_supply_ppe_monthly = 0)) %>% 
+  select(month, county, total_supply_ppe_monthly)
+
+##every month there's ppe supply
+```
+
+
+## 2.8.1 Ventilator dependent unit
+
+```{r}
+ventilator_dependent_unit =
+NHCovid_df_by_month %>% 
+  filter(submitted_data == "Y") %>% 
+  select(month, day, county, ventilator_dependent_unit) %>% 
+    mutate(
+     ventilator_dependent_unit = case_when(
+      ventilator_dependent_unit != "N"  ~ 1)) %>% 
+replace_na(list(ventilator_dependent_unit = 0)) %>% 
+  select(month, day, county, ventilator_dependent_unit)
+```
+
+## 2.8.2 monthly Ventilator dependent unit
+```{r}
+monthly_ventilator_dependent_unit = 
+ventilator_dependent_unit %>% 
+  mutate(month = as.numeric(month)) %>% 
+  group_by(month, county) %>% 
+  summarise(
+    total_ventilator_dependent_unit = sum(ventilator_dependent_unit)
+  ) %>% 
+  mutate(
+   ventilator_dependent_unit_monthly = case_when(
+     total_ventilator_dependent_unit > 0  ~ 1
+   ) 
+  ) %>% 
+  replace_na(list(ventilator_dependent_unit_monthly = 0)) %>% 
+  select(month, county, ventilator_dependent_unit_monthly)
+
 #plot
-supply_of_ppe_plot =
-  supply_of_ppe %>% 
-  filter(total_supply_ppe == 0) %>% 
+monthly_ventilator_dependent_unit_plot =
+  monthly_ventilator_dependent_unit %>% 
+  filter(ventilator_dependent_unit_monthly == 1) %>% 
 ggplot(aes(x = county, y = month, color = month)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+monthly_ventilator_dependent_unit_plot
 ```
 
 
-## 2.8 Ventilator supply
-
+## 2.9  Merge 3 categorical variables by month for regression
 ```{r}
-nystate_df = 
-  read_csv("./Data/nystate.csv") %>% 
-  janitor::clean_names() %>% 
-  separate(week_ending, into = c("month", "day", "year"), sep = "/") %>% 
-  mutate(
-    month = as.numeric(month)
-  ) %>% 
-  mutate(
-    day = as.numeric(day)
-  )  
+two_df =
+left_join(monthly_supply_of_ppe, monthly_shortage_of_stuff, by = c("county", "month")) 
 
-nystate_df %>% 
-  filter(submitted_data == "Y") %>% 
-   select(month, day, county, one_week_supply_of_ventilator_supplies) %>% 
-  mutate(
-    one_week_supply_of_ventilator_supplies = str_replace(one_week_supply_of_ventilator_supplies, "N", 0)
-  )
-  
-```
-
-
-## 2.9  Merge regression data
-```{r}
-regression_df =
-left_join(supply_of_ppe, shortage_of_stuff, by = c("county", "month")) 
+categorical_df =
+  left_join(two_df, monthly_ventilator_dependent_unit, by = c("county", "month")) 
+write_csv(categorical_df, path = "./data/categorical_df.csv")
 ```
 
 
