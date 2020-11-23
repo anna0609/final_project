@@ -98,6 +98,8 @@ daily_fatal_plot1 =
 daily_fatal_plot1 =
   daily_fatal_plot1 %>% 
   ggplotly()
+
+daily_fatal_plot1
 ```
 
 
@@ -144,6 +146,8 @@ monthly_fatal_plot1 =
 monthly_fatal_plot1 =
   monthly_fatal_plot1 %>% 
   ggplotly()
+
+monthly_fatal_plot1
 
 ```
 
