@@ -9,6 +9,7 @@ output: github_document
 library(tidyverse)
 library(readr)
 library(plotly)
+library(gapminder)
 knitr::opts_chunk$set(
   fig.width = 6,
   fig.asp = .6,
@@ -245,14 +246,14 @@ write_csv(NH_monthly_prevalence, path = "./NH_monthly_prevalence.csv")
 ```
 
 
-## 2.6 Combine shortage of stuff
+## 2.6.1 Combine weekly shortage of stuff
 
 ```{r, message=FALSE}
 #data
 shortage_of_stuff =
 NHCovid_df_by_month %>% 
   filter(submitted_data == "Y") %>% 
-  select(month, county, starts_with("shortage")) %>% 
+  select(month, day, county, starts_with("shortage")) %>% 
     mutate(
      total_shortage_stuff = case_when(
       shortage_of_nursing_staff != "N"  ~ 1,
@@ -260,26 +261,47 @@ NHCovid_df_by_month %>%
       shortage_of_aides != "N"          ~ 1,
       shortage_of_other_staff != "N"    ~ 1)) %>% 
 replace_na(list(total_shortage_stuff = 0)) %>% 
-  select(month, county, total_shortage_stuff)
+  select(month, day, county, total_shortage_stuff)
+  
+```
+
+## 2.6.2 convert weekly shortage of stuff to monthly
+
+```{r}
+monthly_shortage_of_stuff = 
+shortage_of_stuff %>% 
+  mutate(month = as.numeric(month)) %>% 
+  group_by(month, county) %>% 
+  summarise(
+    total_shortage_stuff_month = sum(total_shortage_stuff)
+  ) %>% 
+  mutate(
+   total_shortage_stuff_monthly = case_when(
+     total_shortage_stuff_month > 0  ~ 1
+   ) 
+  ) %>% 
+  replace_na(list(total_shortage_stuff_monthly = 0)) %>% 
+  select(month, county, total_shortage_stuff_monthly)
 
 #plot
-shortage_of_stuff_plot =
-  shortage_of_stuff %>% 
-  filter(total_shortage_stuff == 1) %>% 
+monthly_shortage_of_stuff_plot =
+  monthly_shortage_of_stuff %>% 
+  filter(total_shortage_stuff_monthly == 1) %>% 
 ggplot(aes(x = county, y = month, color = month)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
-shortage_of_stuff_plot
+monthly_shortage_of_stuff_plot
 ```
 
-## 2.7 Combine one-week supply of ppe
+
+## 2.7.1 Combine one-week supply of ppe
 ```{r, message=FALSE}
 #data
 supply_of_ppe =
 NHCovid_df_by_month %>% 
   filter(submitted_data == "Y") %>% 
-  select(month, county, starts_with("one_week_supply"), -one_week_supply_of_ventilator_supplies) %>% 
+  select(month, county, day, starts_with("one_week_supply"), -one_week_supply_of_ventilator_supplies) %>% 
     mutate(
      total_supply_ppe = case_when(
       one_week_supply_of_n95_masks      != "N" ~ 1,
@@ -289,38 +311,87 @@ NHCovid_df_by_month %>%
       one_week_supply_of_gloves         != "N" ~ 1,
       one_week_supply_of_hand_sanitizer != "N" ~ 1)) %>% 
 replace_na(list(total_supply_ppe = 0)) %>% 
-  select(month, county, total_supply_ppe)
+  select(month, day, county, total_supply_ppe)
 
 #supply_of_ppe %>% 
 #  filter(total_supply_ppe == 0) only 105/13983, very small portion didn't have weekly supply
 
+```
+
+
+## 2.7.2 monthly supply of ppe
+
+```{r}
+monthly_supply_of_ppe = 
+supply_of_ppe %>% 
+  mutate(month = as.numeric(month)) %>% 
+  group_by(month, county) %>% 
+  summarise(
+    total_supply_ppe_month = sum(total_supply_ppe)
+  ) %>% 
+  mutate(
+   total_supply_ppe_monthly = case_when(
+     total_supply_ppe_month > 0  ~ 1
+   ) 
+  ) %>% 
+  replace_na(list(total_supply_ppe_monthly = 0)) %>% 
+  select(month, county, total_supply_ppe_monthly)
+
+##every month there's ppe supply
+```
+
+
+## 2.8.1 Ventilator dependent unit
+
+```{r}
+ventilator_dependent_unit =
+NHCovid_df_by_month %>% 
+  filter(submitted_data == "Y") %>% 
+  select(month, day, county, ventilator_dependent_unit) %>% 
+    mutate(
+     ventilator_dependent_unit = case_when(
+      ventilator_dependent_unit != "N"  ~ 1)) %>% 
+replace_na(list(ventilator_dependent_unit = 0)) %>% 
+  select(month, day, county, ventilator_dependent_unit)
+```
+
+## 2.8.2 monthly Ventilator dependent unit
+```{r}
+monthly_ventilator_dependent_unit = 
+ventilator_dependent_unit %>% 
+  mutate(month = as.numeric(month)) %>% 
+  group_by(month, county) %>% 
+  summarise(
+    total_ventilator_dependent_unit = sum(ventilator_dependent_unit)
+  ) %>% 
+  mutate(
+   ventilator_dependent_unit_monthly = case_when(
+     total_ventilator_dependent_unit > 0  ~ 1
+   ) 
+  ) %>% 
+  replace_na(list(ventilator_dependent_unit_monthly = 0)) %>% 
+  select(month, county, ventilator_dependent_unit_monthly)
+
 #plot
-supply_of_ppe_plot =
-  supply_of_ppe %>% 
-  filter(total_supply_ppe == 0) %>% 
+monthly_ventilator_dependent_unit_plot =
+  monthly_ventilator_dependent_unit %>% 
+  filter(ventilator_dependent_unit_monthly == 1) %>% 
 ggplot(aes(x = county, y = month, color = month)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
+monthly_ventilator_dependent_unit_plot
 ```
 
 
-## 2.8 Ventilator supply
-```{r, error=TRUE}
-#data
-supply_of_ventilator =
-NHCovid_df_by_month %>% 
-  filter(submitted_data == "Y") %>% 
-  select(month, county, one_week_supply_of_ventilator_supplies) %>% 
-    mutate(
-      one_week_supply_of_ventilator_supplies = fct_recode(one_week_supply_of_ventilator_supplies, Y = "1", N = "0"))
-
-```
-
-## 2.9  Merge regression data
+## 2.9  Merge 3 categorical variables by month for regression
 ```{r}
-regression_df =
-left_join(supply_of_ppe, shortage_of_stuff, by = c("county","month")) 
+two_df =
+left_join(monthly_supply_of_ppe, monthly_shortage_of_stuff, by = c("county", "month")) 
+
+categorical_df =
+  left_join(two_df, monthly_ventilator_dependent_unit, by = c("county", "month")) 
+write_csv(categorical_df, path = "./data/categorical_df.csv")
 ```
 
 
