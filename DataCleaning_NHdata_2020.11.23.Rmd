@@ -262,46 +262,58 @@ NH_monthly_prevalence =
 write_csv(NH_monthly_prevalence, path = "./NH_monthly_prevalence.csv")
 ```
 
+## 2.6 Functions set up to reveal the actual increment of cases and deaths by month
+
+```{r}
+# data (summarize monthly death by function)
+delta_death = function(data, i, c) {
+  if (i < 6) {
+    delta = data %>% ungroup() %>%
+      filter(county == c, month == 5) %>% 
+      select(residents_covid19_deaths_per_month) %>% 
+      as.numeric()
+  }
+  else {
+    death_mo_i = data %>% ungroup() %>%
+      filter(county == c, month == i) %>% 
+      select(residents_covid19_deaths_per_month) %>% 
+      as.numeric()
+    j = i-1
+    death_mo_i_1 = data %>% ungroup() %>%
+      filter(county == c, month == j) %>% 
+      select(residents_covid19_deaths_per_month) %>% 
+      as.numeric()
+    
+    delta = death_mo_i - death_mo_i_1
+  }
+  delta
+}
+
+NHCovid_df_fatality = NHCovid_df_fatality %>%
+  transform(month = as.numeric(month))
+
+output = purrr::map2(.x = NHCovid_df_fatality$month,
+                     .y = NHCovid_df_fatality$county, 
+                     ~NHCovid_df_county_delta_death(NHCovid_df_fatality,
+                                                    i = .x,
+                                                    c = .y))
+
+NHCovid_df_fatality_updated = cbind(NHCovid_df_fatality, as_vector(output))
+
+```
+
 # 3. Combine all variables
 
 ```{r}
 # read in categorical_df.csv
 categorial_df = 
-  read_csv()
-```
+  read_csv("./data/categorical_df.csv")
+# read in 
 
-## 2.6 Functions set up to reveal the actual increment of cases and deaths by month
-
-```{r}
-# data (summarize monthly death by function)
-NHCovid_df_county_delta_death = function(i, c) {
-  
-  if (i < 6) {
-    delta = data %>% ungroup() %>%
-      filter(county == c, month = 5) %>% 
-      select(residents_covid19_deaths_per_month) %>% 
-      as.numeric()
-    
-    delta
-  }
-  
-  if (i >= 6) {
-    death_mo_i = data %>% ungroup() %>%
-      filter(county == c, month = i) %>% 
-      select(residents_covid19_deaths_per_month) %>% 
-      as.numeric()
-
-    death_mo_i_1 = data %>% ungroup() %>%
-      filter(county == c, month = i - 1) %>% 
-      select(residents_covid19_deaths_per_month) %>% 
-      as.numeric
-    
-    delta = death_mo_i - death_mo_i_1
-    delta
-  }
-}
-
-output = purrr::map(.x = NHCovid_df_mortality, NHCovid_df_county_delta_death)
-
+Overall_df = 
+  left_join(NHCovid_df_fatality, NH_monthly_prevalence, by = c("county", "month")) %>% 
+  left_join(NH_occupancy_rate, by = c("county", "month")) %>% 
+  left_join(categorial_df, by = c("county", "month")) %>% 
+  left_join(NH_staff_flu_vac_rate, by = "county")
 ```
 
