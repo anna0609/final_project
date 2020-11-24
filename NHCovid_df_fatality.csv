@@ -1,4 +1,4 @@
-month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_month,fatality_rate
+month,county,residents_covid19_deaths_per_month,residents_covid19_cases_per_month,NH_monthly_fatality_rate
 5,Albany,42,130,0.3230769230769231
 6,Albany,4,11,0.36363636363636365
 7,Albany,4,14,0.2857142857142857

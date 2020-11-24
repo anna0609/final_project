@@ -126,13 +126,13 @@ monthly_confirmed_plot
 #data (Calculate case fatality rate)
 NHCovid_df_fatality = 
   left_join(NHCovid_df_county_monthly_death, NHCovid_df_county_monthly_confirmed, by = c("county", "month")) %>% 
-  mutate(fatality_rate = residents_covid19_deaths_per_month/residents_covid19_cases_per_month)
+  mutate(NH_monthly_fatality_rate = residents_covid19_deaths_per_month/residents_covid19_cases_per_month)
 
 write_csv(NHCovid_df_fatality, path = "./NHCovid_df_fatality.csv")
 
 #plot
 monthly_fatality_plot =
-ggplot(NHCovid_df_fatality, aes(x = county, y = fatality_rate, color = month)) +
+ggplot(NHCovid_df_fatality, aes(x = county, y = NH_monthly_fatality_rate, color = month)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
@@ -236,11 +236,12 @@ NH_occupancy_rate =
   NHCovid_df_by_month %>%
   select(month, day, provider_name, county, total_number_of_occupied_beds, number_of_all_beds) %>% 
   drop_na() %>% 
-  mutate(occupancy_rate =
+  mutate(NH_occupancy_rate =
            total_number_of_occupied_beds/number_of_all_beds) %>% 
   group_by(month, county) %>% 
   summarize(
-    occupancy_rate = mean(occupancy_rate)) 
+    NH_occupancy_rate = mean(NH_occupancy_rate)) %>% 
+  transform(month = as.numeric(month))
 
 write_csv(NH_occupancy_rate, path = "./NH_occupancy_rate.csv")
 ```
@@ -257,7 +258,8 @@ NH_monthly_prevalence =
     county_occupancy = sum(total_number_of_occupied_beds),
     county_cases = sum(residents_total_confirmed_covid_19),
     county_prevalence = county_cases/county_occupancy
-    ) 
+    ) %>% 
+  transform(month = as.numeric(month))
 
 write_csv(NH_monthly_prevalence, path = "./NH_monthly_prevalence.csv")
 ```
@@ -294,7 +296,7 @@ NHCovid_df_fatality = NHCovid_df_fatality %>%
 
 output = purrr::map2(.x = NHCovid_df_fatality$month,
                      .y = NHCovid_df_fatality$county, 
-                     ~NHCovid_df_county_delta_death(NHCovid_df_fatality,
+                     ~delta_death(NHCovid_df_fatality,
                                                     i = .x,
                                                     c = .y))
 
@@ -308,11 +310,13 @@ NHCovid_df_fatality_updated = cbind(NHCovid_df_fatality, as_vector(output))
 # read in categorical_df.csv
 categorial_df = 
   read_csv("./data/categorical_df.csv")
+
 # read in merged_df.csv for nationwide infection and fatality rate
 merged_df =
   read_csv(("./data/merged_df.csv")) %>% 
   janitor::clean_names() %>% 
   separate(month, into = c("month", "day", "year"), sep = "/") %>% 
+  transform(month = as.factor(month)) %>% 
   transform(month = as.numeric(month)) %>% 
   filter(month > 4) %>% 
   filter(month < 11) %>% 
@@ -321,8 +325,8 @@ merged_df =
 Overall_df = 
   left_join(NHCovid_df_fatality, NH_monthly_prevalence, by = c("county", "month")) %>% 
   left_join(NH_occupancy_rate, by = c("county", "month")) %>% 
-  left_join(categorial_df, by = c("county", "month")) %>% 
   left_join(NH_staff_flu_vac_rate, by = "county") %>% 
+  left_join(categorial_df, by = c("county", "month")) %>% 
   left_join(merged_df, by = c("county", "month"))
 ```
 
