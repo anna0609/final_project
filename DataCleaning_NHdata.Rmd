@@ -1,0 +1,63 @@
+---
+title: "Final-Project_JS"
+author: Jianting Shi
+date: 2020-11-16
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+
+```
+
+```{r}
+# Read in Covid Nursing Home data and filter data from only NY state
+NHCovid_df = read_csv("./Data/COVID-19 Nursing Home Data - Archived Data - Week Ending 10_25_20.csv") %>% 
+  janitor::clean_names() %>% 
+  filter(provider_state == "NY")
+
+# Break down specific date into month
+NHCovid_df_by_month = 
+  NHCovid_df %>% 
+  separate(week_ending, into = c("month", "day", "year"), sep = "/") %>% 
+  mutate(month = factor(month, levels = c("05", "06", "07", "08", "09", "10"))) 
+
+# Summarize monthly death
+NHCovid_df_county_monthly_death =
+  NHCovid_df_by_month %>% 
+  # to eliminate N/A, filter by submitted data and quality check
+  filter(submitted_data == "Y", passed_quality_assurance_check == "Y") %>% 
+  group_by(month, county) %>% 
+  summarise(residents_covid19_deaths_per_month = sum(residents_weekly_covid_19_deaths))
+
+ggplot(NHCovid_df_county_monthly_death, aes(x = month, y = residents_covid19_deaths_per_month, color = county)) +
+  geom_histogram()
+
+# Summarize monthly confirmed cases
+NHCovid_df_county_monthly_confirmed =
+  NHCovid_df_by_month %>% 
+  # to eliminate N/A, filter by submitted data and quality check
+  filter(submitted_data == "Y", passed_quality_assurance_check == "Y") %>% 
+  group_by(month, county) %>% 
+  summarise(residents_covid19_cases_per_month = sum(residents_weekly_confirmed_covid_19))
+
+# Summarize monthly admission cases
+NHCovid_df_county_monthly_admission =
+  NHCovid_df_by_month %>% 
+  # to eliminate N/A, filter by submitted data and quality check
+  filter(submitted_data == "Y", passed_quality_assurance_check == "Y") %>% 
+  group_by(month, county) %>% 
+  summarise(residents_covid19_admission_per_month = sum(residents_weekly_admissions_covid_19))
+
+NHCovid_df_case = 
+  left_join(NHCovid_df_county_monthly_confirmed, NHCovid_df_county_monthly_admission, by = c("month", "county")) %>% 
+  mutate(total_cases = residents_covid19_cases_per_month + residents_covid19_admission_per_month) 
+
+NHCovid_df_mortality = 
+  left_join(NHCovid_df_case, NHCovid_df_county_monthly_death, by = c("month", "county")) %>% 
+  mutate(mortality = residents_covid19_deaths_per_month / total_cases) %>% 
+  filter(mortality >= 0)
+
+
+```
+
