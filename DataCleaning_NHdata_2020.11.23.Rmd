@@ -201,7 +201,7 @@ ggplot(NHCovid_df_fatality_2, aes(x = county, y = fatality_rate, color = month))
 monthly_fatality_plot_2
 ```
 
-## 2.3 Combine shortage of supply
+## 2.3 Combine shortage of supply (please see updated codes in Minjie.rmd)
 
 ```{r}
 #data
@@ -308,12 +308,21 @@ NHCovid_df_fatality_updated = cbind(NHCovid_df_fatality, as_vector(output))
 # read in categorical_df.csv
 categorial_df = 
   read_csv("./data/categorical_df.csv")
-# read in 
+# read in merged_df.csv for nationwide infection and fatality rate
+merged_df =
+  read_csv(("./data/merged_df.csv")) %>% 
+  janitor::clean_names() %>% 
+  separate(month, into = c("month", "day", "year"), sep = "/") %>% 
+  transform(month = as.numeric(month)) %>% 
+  filter(month > 4) %>% 
+  filter(month < 11) %>% 
+  select(-day, -year)
 
 Overall_df = 
   left_join(NHCovid_df_fatality, NH_monthly_prevalence, by = c("county", "month")) %>% 
   left_join(NH_occupancy_rate, by = c("county", "month")) %>% 
   left_join(categorial_df, by = c("county", "month")) %>% 
-  left_join(NH_staff_flu_vac_rate, by = "county")
+  left_join(NH_staff_flu_vac_rate, by = "county") %>% 
+  left_join(merged_df, by = c("county", "month"))
 ```
 
