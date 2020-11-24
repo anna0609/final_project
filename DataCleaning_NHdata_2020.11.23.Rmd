@@ -328,5 +328,7 @@ Overall_df =
   left_join(NH_staff_flu_vac_rate, by = "county") %>% 
   left_join(categorial_df, by = c("county", "month")) %>% 
   left_join(merged_df, by = c("county", "month"))
+
+write_csv(Overall_df, path = "./data/Overall_df.csv")
 ```
 
