@@ -404,6 +404,13 @@ library(readxl)</code></pre>
 ##  9 Chenango    R              
 ## 10 Clinton     R              
 ## # ... with 52 more rows</code></pre>
+<pre class="r"><code>overall_df = read_csv(&quot;./data/Overall_df.csv&quot;)
+
+overall_df =
+  overall_df %&gt;%
+  left_join(county_poll, by = &quot;county&quot;)
+
+write.csv(overall_df, file = &quot;overall_df.csv&quot;, quote = FALSE, row.names = F) </code></pre>
 </div>
 <div id="new-york-statewide-covid-19-testing" class="section level2">
 <h2>New York Statewide Covid-19 Testing</h2>

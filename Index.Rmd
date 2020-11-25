@@ -21,6 +21,14 @@ county_poll = read_excel("./data/nycounty_results.xlsx") %>%
   select(county, election_result)
 
 county_poll
+
+overall_df = read_csv("./data/Overall_df.csv")
+
+overall_df =
+  overall_df %>%
+  left_join(county_poll, by = "county")
+
+write.csv(overall_df, file = "overall_df.csv", quote = FALSE, row.names = F) 
 ```
 
 ## New York Statewide Covid-19 Testing
