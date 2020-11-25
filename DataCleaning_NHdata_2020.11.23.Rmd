@@ -291,16 +291,16 @@ delta_death = function(data, i, c) {
   delta
 }
 
-NHCovid_df_fatality = NHCovid_df_fatality %>%
+NHCovid_df_county_monthly_death_2 = NHCovid_df_county_monthly_death_2 %>%
   transform(month = as.numeric(month))
 
-output = purrr::map2(.x = NHCovid_df_fatality$month,
-                     .y = NHCovid_df_fatality$county, 
-                     ~delta_death(NHCovid_df_fatality,
+output = purrr::map2(.x = NHCovid_df_county_monthly_death_2$month,
+                     .y = NHCovid_df_county_monthly_death_2$county, 
+                     ~delta_death(NHCovid_df_county_monthly_death_2,
                                                     i = .x,
                                                     c = .y))
 
-NHCovid_df_fatality_updated = cbind(NHCovid_df_fatality, as_vector(output))
+NHCovid_df_fatality_updated = cbind(NHCovid_df_county_monthly_death_2, as_vector(output))
 
 ```
 
