@@ -6,3 +6,58 @@ output:
     toc_float: true
 ---
 
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+
+library(plotly)
+```
+
+# NH Home overview
+
+```{r}
+# read in raw data "overall_df.csv"
+overall_df = 
+  read.csv("./data/overall_df.csv") %>% 
+  janitor::clean_names()
+```
+
+```{r}
+# explore the trend of overall_df
+NH_newcase_permonth =
+  overall_df %>% 
+  select(month, county, residents_covid19_cases_per_month)
+
+County_newcase_permonth = 
+  overall_df %>% 
+  select(month, county, monthly_new_positives)
+
+monthly_new_cases =
+ggplot() +
+  geom_line(data = NH_newcase_permonth, aes(x = month, y = residents_covid19_cases_per_month), color = "blue") +
+  geom_line(data = County_newcase_permonth, aes(x = month, y = monthly_new_positives), color = "black") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+monthly_new_cases
+```
+
+```{r}
+# explore the trend of infection rate
+NH_infection_rate =
+  overall_df %>% 
+  select(month, county, county_prevalence)
+
+County_infection_rate = 
+  overall_df %>% 
+  select(month, county, monthly_infection_rate)
+
+compare_infection_rate =
+ggplot() +
+  geom_point(data = NH_infection_rate, aes(x = county, y = county_prevalence), color = "blue") +
+  geom_point(data = County_infection_rate, aes(x = county, y = monthly_infection_rate), color = "black") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+compare_infection_rate
+```
