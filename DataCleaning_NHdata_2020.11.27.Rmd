@@ -249,16 +249,23 @@ write_csv(NH_occupancy_rate, path = "./NH_occupancy_rate.csv")
 ## 2.5 NH monthly prevalence of Covid-19
 
 ```{r}
-NH_monthly_prevalence =
+NH_monthly_prevalence1 =
   NHCovid_df_by_day %>% 
   #select(month, day, county, total_number_of_occupied_beds, residents_total_confirmed_covid_19) %>% 
   #drop_na() %>% 
+  group_by(month,county) %>% 
+  summarize(county_monthly_occupancy = sum(total_number_of_occupied_beds)) %>% 
+  transform(month = as.numeric(month))
+
+NH_monthly_prevalence2 =
+  NHCovid_df_by_month %>% 
   group_by(month, county) %>% 
-  mutate(
-    county_occupancy = sum(total_number_of_occupied_beds),
-    county_cases = sum(residents_total_confirmed_covid_19),
-    county_prevalence = county_cases/county_occupancy
-    ) 
+  summarize(county_monthly_cases = sum(residents_weekly_confirmed_covid_19)) %>% 
+  transform(month = as.numeric(month))
+
+NH_monthly_prevalence =
+  left_join(NH_monthly_prevalence1, NH_monthly_prevalence2, by = c("month", "county")) %>% 
+  mutate(county_monthly_prevalence = county_monthly_cases/county_monthly_occupancy)
 
 write_csv(NH_monthly_prevalence, path = "./NH_monthly_prevalence.csv")
 ```
