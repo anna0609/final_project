@@ -3,3 +3,99 @@ title: "Fun Explorations"
 output:
   html_document
 ---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(rvest)
+library(dplyr)
+library(patchwork)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis",
+  digits = 3
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+# Staff Flu Vacinnation Rate in each county (overview)
+
+```{r echo = FALSE, fig.align = 'center'}
+data_df = read.csv("./data/overall_df.csv")
+
+vacci_rate_graph =
+  data_df %>%
+    select(month, county, staff_flu_vaccination_rate, residents_covid19_cases_per_month) %>%
+    drop_na(staff_flu_vaccination_rate) %>%
+    mutate(
+     county = fct_reorder(county, staff_flu_vaccination_rate)
+    ) %>%
+    ggplot(aes(x = county, y = staff_flu_vaccination_rate, color = county)) +
+    geom_point(na.rm = T) +
+    geom_line(na.rm = T) +
+    labs(title = "Staff Flu-Vaccination Rate", x = "County", y = "Rate") +
+    theme(
+      axis.text.x = element_text(angle = 90, vjust = 0.6, hjust = 0.5),
+      legend.position = "none",
+      plot.title = element_text(hjust = 0.5, size = 15),
+    )
+
+vacci_rate_graph
+```
+
+
+# Staff-Vaccination rate vs NH residents' cases
+```{r echo = FALSE, fig.align = 'center'}
+vacci_vs_cases =
+  data_df %>%
+  select(month, county, staff_flu_vaccination_rate, residents_covid19_cases_per_month) %>%
+  drop_na(residents_covid19_cases_per_month) %>%
+  ggplot(aes(x = staff_flu_vaccination_rate, y = residents_covid19_cases_per_month)) +
+  geom_point(alpha = 0.6, color = "lightblue", na.rm = T) +
+  labs(title = "Staff Flu-Vaccination Rate vs. Covid-19 Cases", x = "Rate", y = "Covid-19 Cases / Month", subtitle = "2020.5 - 2020.10") +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 15),
+    plot.subtitle = element_text(hjust = 0.5))
+
+vacci_vs_cases
+```
+
+
+# Facility-related vs. death trend
+```{r echo = FALSE, fig.align = 'center'}
+facility_death_trend =
+  data_df %>%
+  select(month, county, total_shortage_stuff_monthly, ventilator_dependent_unit_monthly, NH_monthly_fatality_rate, total_supply_ppe_monthly) %>%
+  drop_na(NH_monthly_fatality_rate)
+
+facility_all =
+  facility_death_trend %>%
+  filter(total_shortage_stuff_monthly == 1, NH_monthly_fatality_rate < 1) %>%
+  ggplot(aes(x = month, y = NH_monthly_fatality_rate, color = county, group = county)) +
+  geom_point() +
+  geom_line()
+  
+```
+
+# Separate counties into two democratic parties and then compare!
+
+```{r echo = FALSE, fig.align = 'center'}
+election_df =
+  data_df %>%
+  select(month, county, election_result, NH_monthly_fatality_rate) %>%
+  filter(NH_monthly_fatality_rate < 1) %>%
+  drop_na(NH_monthly_fatality_rate, election_result) %>%
+  mutate(
+    election_result = str_replace(election_result, "D", "Democratic wins county"),
+    election_result = str_replace(election_result, "R", "Republican wins county")
+  ) %>%
+  ggplot(aes(x = NH_monthly_fatality_rate, fill = election_result)) +
+  geom_density(alpha = 0.4, adjust = 0.5, color = "pink") +
+  labs(x = "Nursing Home Monthly Fatality Rate", y = "Density", fill = "Election Result") +
+  scale_fill_manual(values = c("skyblue", "pink"))
+
+election_df
+```
+
