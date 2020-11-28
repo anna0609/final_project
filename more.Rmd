@@ -20,7 +20,17 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
-# Staff Flu Vacinnation Rate in each county (overview)
+##### In this fun explorations section, we discuss two interesting topics:
+#####   1. What is the staff flu-vaccination rates in each county and how they may relate to the covid-19 confirmed cases in nursing homes each month according to the trend
+#####   2. How may election results relate to the Covid-19 outcomes in nursing homes? <br></br>
+
+## Staff Flu-Vaccination Rates in Each County (overview)
+<br></br>
+<center>![](./pictures/vaccination.jpg){width=70%}</center>
+<br></br>
+
+##### We have collected nursing home employees' flu-vaccination rates and use county as unit to make observations.
+##### Following is an overview graph for each county:
 
 ```{r echo = FALSE, fig.align = 'center'}
 data_df = read.csv("./data/overall_df.csv")
@@ -32,7 +42,7 @@ vacci_rate_graph =
     mutate(
      county = fct_reorder(county, staff_flu_vaccination_rate)
     ) %>%
-    ggplot(aes(x = county, y = staff_flu_vaccination_rate, color = county)) +
+    ggplot(aes(x = county, y = staff_flu_vaccination_rate, color = staff_flu_vaccination_rate)) +
     geom_point(na.rm = T) +
     geom_line(na.rm = T) +
     labs(title = "Staff Flu-Vaccination Rate", x = "County", y = "Rate") +
@@ -45,8 +55,13 @@ vacci_rate_graph =
 vacci_rate_graph
 ```
 
+##### We can observe that almost all counties' nursing home have >50% flu-vaccination rate for their employees except for Lewis and Franklin county (The lewis county may have wrong data input in flu-vaccination rate). A big trunk of county have >75% flu-vaccination rate. Yates, Clinton, and Greene ranks 1 to 3 in flu-vaccination rate correspondingly. <br></br>
 
-# Staff-Vaccination rate vs NH residents' cases
+## Staff-Vaccination rate vs NH residents' cases
+
+##### We want to see the relationship between nursing home employees' flu-vaccination rates and the Covid-19 confirmed cases each month. Here is the plot showing this relationship during 2020.5 to 2020.10:
+<br></br>
+
 ```{r echo = FALSE, fig.align = 'center'}
 vacci_vs_cases =
   data_df %>%
@@ -62,8 +77,9 @@ vacci_vs_cases =
 vacci_vs_cases
 ```
 
+##### As can see from the plot, most data points cluster in the bottom right corner, and as the flu-vaccination rate exceeds 87.5%, the confirmed covid-19 cases per month keeps stable under 125 cases. This may imply that higher employees' flu-vaccination rate may have a protective effect from covid-19 infection, but further analysis is conducted in regression analysis. Please see the analysis section in the website. <br></br>
 
-# Facility-related vs. death trend
+
 ```{r echo = FALSE, fig.align = 'center'}
 facility_death_trend =
   data_df %>%
@@ -79,7 +95,14 @@ facility_all =
   
 ```
 
-# Separate counties into two democratic parties and then compare!
+## How does election relate to the Covid-19 situations in nursing homes?
+
+<br></br>
+<center>![](./pictures/voting.jpg){width=70%}</center>
+<br></br>
+
+##### We separate counties into two democratic parties and then observe the nursing home monthly fatality rate. For the counties that have more support rate for republican party, their nursing home monthly fatality rate tend to be generally lower than that of the counties having more support rate for democratic party. Also, the republican winning counties have more density in 0% ~ 0.1% monthly fatality rate.
+##### It is reasonable that for the counties which have higher monthly fatality rate in nursing homes, they may be insatisfied for the current covid-19 policy and tend to support an alternative political party(the democratic party). But there may exist many confounders if further analyze the relationship. For example, the democratic winning counties cluster in more developed areas instead of rural areas, therefore the education levels may be an significant confounder. More analysis is done in the analysis section in the website.
 
 ```{r echo = FALSE, fig.align = 'center'}
 election_df =
