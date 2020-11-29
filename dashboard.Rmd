@@ -13,3 +13,14 @@ library(tidyverse)
 library(plotly)
 ```
 
+# Nursing home occupancy rate
+
+```{r}
+  instacart %>% 
+  group_by(department, order_hour_of_day) %>% 
+  tally() %>% 
+  filter(n > 3000) %>% 
+  plot_ly(x = ~order_hour_of_day, y = ~n, color = ~department, type = "bar", colors = "viridis") 
+```
+```
+
