@@ -1,11 +1,13 @@
 ---
-title: "Overview"
+title: "overview"
 output:
   html_document
     toc:true
     toc_float:true
 ---
 
+<<<<<<< HEAD
+=======
 ```{r}
 library(tidyverse)
 library(p8105.datasets)
@@ -84,4 +86,5 @@ compare_fatality_rate
 ```
 
 
+>>>>>>> 77f8f1b4a65277580776573f3fdfd299dabfe692
 

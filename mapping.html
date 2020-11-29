@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Pangsibo Shen" />
 
+<meta name="date" content="2020-11-29" />
 
-<title>NY State Nursing Homes in Covid-19 pandemic</title>
+<title>mapping</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -288,7 +290,7 @@ $(document).ready(function () {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="about.html">About</a>
+  <a href="about.html">ABOUT</a>
 </li>
 <li>
   <a href="overview.html">Overview</a>
@@ -323,27 +325,37 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">NY State Nursing Homes in Covid-19 pandemic</h1>
+<h1 class="title toc-ignore">mapping</h1>
+<h4 class="author">Pangsibo Shen</h4>
+<h4 class="date">11/29/2020</h4>
 
 </div>
 
 
-<div id="comparing-nursing-homes-situations-of-each-county-to-that-of-the-whole-country" class="section level3">
-<h3>Comparing nursing homes’ situations of each county to that of the whole country</h3>
-<div id="jianting-shijs5095-minjie-baomb4757-pangsibo-shenps3194-phoebe-mokm3624-yutian-luoyl4608" class="section level4">
-<h4>Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km3624), Yutian Luo(yl4608)</h4>
-<p><img src="pictures/cover.jpg" /></p>
-</div>
-</div>
-<div id="website-navigation" class="section level3">
-<h3>Website Navigation</h3>
-<ul>
-<li><b>Overview</b>: Multiple trend comparisons between nursing homes(county as unit) and the whole country</li>
-<li><b>Nursing Home Trends</b>: Multiple trend comparisons of nursing homes between different counties</li>
-<li><b>Analysis</b>: Includes non-parametric tests / linear regression analysis</li>
-<li><b>Fun Explorations</b>: Discuss other factors, such as political influence and nursing home facility, and how they may relate to the situations in NY nursing homes</li>
-</ul>
-</div>
+<pre class="r"><code>library(tidyverse)
+library(leaflet)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;leaflet&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:xts&#39;:
+## 
+##     addLegend</code></pre>
+<pre class="r"><code>county_seats = read_csv(&quot;./data/County_Seats.csv&quot;) %&gt;%
+  janitor::clean_names() %&gt;%
+  select(c(&quot;county&quot;,&quot;city&quot;,&quot;longitude&quot;,&quot;latitude&quot;))</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   County = col_character(),
+##   `County Seat` = col_character(),
+##   Address = col_character(),
+##   City = col_character(),
+##   Zip5 = col_double(),
+##   `Contact Type` = col_character(),
+##   Phone = col_character(),
+##   Longitude = col_double(),
+##   Latitude = col_double(),
+##   `County Website` = col_character(),
+##   Location = col_character()
+## )</code></pre>
 
 
 
