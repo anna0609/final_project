@@ -1,0 +1,17 @@
+---
+title: "mapping"
+author: "Pangsibo Shen"
+date: "11/29/2020"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(leaflet)
+```
+
+```{r}
+county_seats = read_csv("./data/County_Seats.csv") %>%
+  janitor::clean_names() %>%
+  select(c("county","city","longitude","latitude"))
+```
+
