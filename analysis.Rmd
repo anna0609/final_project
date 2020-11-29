@@ -2,9 +2,10 @@
 title: "Analysis"
 output: html_document
 code_folding: hide
-toc: true
-toc_float: true
 ---
+In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
+
+## 1. Correlation Matrix
 
 ```{r, message=FALSE}
 library(tidyverse)
@@ -12,9 +13,6 @@ library(corrplot)
 library("Hmisc")
 library("PerformanceAnalytics")
 ```
-
-## correlation matrix
-
 ```{r, message=FALSE}
 my_data =
 read_csv("./data/overall_df.csv") %>%
@@ -67,3 +65,7 @@ ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
 geom_text(aes(x=row, y=column, label=cor), color = "black", size = 2)
 ```
 
+## 2. Wilcoxon Rank-sum Test 
+
+#### a) compare the residents and nursing house seniors’ medians level of infection rate
+#### b) compare the residents and nursing house seniors’ medians level of case fatality rate
