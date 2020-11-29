@@ -1,5 +1,69 @@
 ---
 title: "Analysis"
-output:
-  html_document
+output: html_document
+code_folding: hide
+toc: true
+toc_float: true
 ---
+
+```{r, message=FALSE}
+library(tidyverse)
+library(corrplot)
+library("Hmisc")
+library("PerformanceAnalytics")
+```
+
+## correlation matrix
+
+```{r, message=FALSE}
+my_data =
+read_csv("./data/overall_df.csv") %>%
+  janitor::clean_names() %>% 
+  relocate(election_result) %>% 
+  mutate(
+   election_result = recode(election_result, "D" = "1", "R" = "0")
+   ) %>% 
+  mutate(election_result = as.numeric(election_result)) %>% 
+  select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
+
+res = cor(my_data, use = "complete.obs") #handle missing value
+
+res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
+  
+# Extract the correlation coefficients：res2$r
+# Extract p-values：res2$P
+
+# format the correlation matrix
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+
+res2 = rcorr(as.matrix(my_data[,1:14]))
+tidy_df = 
+  flattenCorrMatrix(res2$r, res2$P) %>%
+  mutate_if(is.numeric, ~round(., 2))
+
+#display a chart of a correlation matrix
+#chart.Correlation(my_data, histogram=TRUE, pch=19)
+# heat map
+col<- colorRampPalette(c("blue", "white", "red"))(20)
+heatmap(x = res, col = col, symm = TRUE)
+
+ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Pearson\nCorrelation") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed() + 
+geom_text(aes(x=row, y=column, label=cor), color = "black", size = 2)
+```
+
