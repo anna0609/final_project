@@ -327,6 +327,7 @@ $(document).ready(function () {
 
 
 <pre class="r"><code>library(tidyverse)</code></pre>
+<<<<<<< HEAD
 <pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --</code></pre>
 <pre><code>## v ggplot2 3.3.2     v purrr   0.3.4
 ## v tibble  3.0.3     v dplyr   1.0.2
@@ -354,6 +355,103 @@ $(document).ready(function () {
 ##   `County Website` = col_character(),
 ##   Location = col_character()
 ## )</code></pre>
+=======
+<pre><code>## ── Attaching packages ──────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
+## ✓ tibble  3.0.3     ✓ dplyr   1.0.2
+## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
+## ✓ readr   1.3.1     ✓ forcats 0.5.0</code></pre>
+<pre><code>## ── Conflicts ─────────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(p8105.datasets)
+library(ggplot2)
+library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code>library(gganimate)</code></pre>
+<pre><code>## No renderer backend detected. gganimate will default to writing frames to separate files
+## Consider installing:
+## - the `gifski` package for gif output
+## - the `av` package for video output
+## and restarting the R session</code></pre>
+<div id="nh-home-overview" class="section level1">
+<h1>NH Home overview</h1>
+<pre class="r"><code># read in raw data &quot;overall_df.csv&quot;
+overall_df = 
+  read.csv(&quot;./data/overall_df_2020.11.27.csv&quot;) %&gt;% 
+  janitor::clean_names()</code></pre>
+<pre class="r"><code># explore the trend of new cases per month
+NH_newcase_permonth =
+  overall_df %&gt;% 
+  select(month, county, residents_covid19_cases_per_month)
+
+County_newcase_permonth = 
+  overall_df %&gt;% 
+  select(month, county, monthly_new_positives)
+
+monthly_new_cases =
+ggplot() +
+  geom_point(data = NH_newcase_permonth, aes(x = month, y = residents_covid19_cases_per_month), color = &quot;blue&quot;) +
+  geom_point(data = County_newcase_permonth, aes(x = month, y = monthly_new_positives), color = &quot;black&quot;) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = &quot;right&quot;) 
+
+monthly_new_cases</code></pre>
+<pre><code>## Warning: Removed 38 rows containing missing values (geom_point).</code></pre>
+<pre><code>## Warning: Removed 60 rows containing missing values (geom_point).</code></pre>
+<p><img src="overview_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code># explore the trend of infection rate
+NH_infection_rate =
+  overall_df %&gt;% 
+  select(month, county, county_monthly_prevalence)
+
+County_infection_rate = 
+  overall_df %&gt;% 
+  select(month, county, monthly_infection_rate)
+
+compare_infection_rate =
+ggplot() +
+  geom_point(data = NH_infection_rate, aes(x = county, y = county_monthly_prevalence), color = &quot;blue&quot;) +
+  geom_point(data = County_infection_rate, aes(x = county, y = monthly_infection_rate), color = &quot;black&quot;) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = &quot;right&quot;) 
+
+compare_infection_rate</code></pre>
+<pre><code>## Warning: Removed 49 rows containing missing values (geom_point).</code></pre>
+<pre><code>## Warning: Removed 60 rows containing missing values (geom_point).</code></pre>
+<p><img src="overview_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code># explore the trend of case fatality rate
+NH_case_fatality_rate =
+  overall_df %&gt;% 
+  select(month, county, nh_monthly_fatality_rate)
+
+County_case_fatality_rate = 
+  overall_df %&gt;% 
+  select(month, county, monthly_fatality_rate)
+
+compare_fatality_rate =
+ggplot() +
+  geom_point(data = NH_case_fatality_rate, aes(x = county, y = nh_monthly_fatality_rate), color = &quot;blue&quot;) +
+  geom_point(data = County_case_fatality_rate, aes(x = county, y = monthly_fatality_rate), color = &quot;black&quot;) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = &quot;right&quot;) 
+
+compare_fatality_rate</code></pre>
+<pre><code>## Warning: Removed 180 rows containing missing values (geom_point).</code></pre>
+<pre><code>## Warning: Removed 60 rows containing missing values (geom_point).</code></pre>
+<p><img src="overview_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+>>>>>>> 77f8f1b4a65277580776573f3fdfd299dabfe692
 
 
 

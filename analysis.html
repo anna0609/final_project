@@ -22,8 +22,19 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -317,7 +328,73 @@ $(document).ready(function () {
 </div>
 
 
+<p>In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.</p>
+<div id="correlation-matrix" class="section level2">
+<h2>1. Correlation Matrix</h2>
+<pre class="r"><code>library(tidyverse)
+library(corrplot)
+library(&quot;Hmisc&quot;)
+library(&quot;PerformanceAnalytics&quot;)</code></pre>
+<pre class="r"><code>my_data =
+read_csv(&quot;./data/overall_df.csv&quot;) %&gt;%
+  janitor::clean_names() %&gt;% 
+  relocate(election_result) %&gt;% 
+  mutate(
+   election_result = recode(election_result, &quot;D&quot; = &quot;1&quot;, &quot;R&quot; = &quot;0&quot;)
+   ) %&gt;% 
+  mutate(election_result = as.numeric(election_result)) %&gt;% 
+  select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
 
+res = cor(my_data, use = &quot;complete.obs&quot;) #handle missing value
+
+res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
+  
+# Extract the correlation coefficients：res2$r
+# Extract p-values：res2$P
+
+# format the correlation matrix
+flattenCorrMatrix &lt;- function(cormat, pmat) {
+  ut &lt;- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+
+res2 = rcorr(as.matrix(my_data[,1:14]))
+tidy_df = 
+  flattenCorrMatrix(res2$r, res2$P) %&gt;%
+  mutate_if(is.numeric, ~round(., 2))
+
+#display a chart of a correlation matrix
+#chart.Correlation(my_data, histogram=TRUE, pch=19)
+# heat map
+col&lt;- colorRampPalette(c(&quot;blue&quot;, &quot;white&quot;, &quot;red&quot;))(20)
+heatmap(x = res, col = col, symm = TRUE)</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
+ geom_tile(color = &quot;white&quot;)+
+ scale_fill_gradient2(low = &quot;blue&quot;, high = &quot;red&quot;, mid = &quot;white&quot;, 
+   midpoint = 0, limit = c(-1,1), space = &quot;Lab&quot;, 
+   name=&quot;Pearson\nCorrelation&quot;) +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed() + 
+geom_text(aes(x=row, y=column, label=cor), color = &quot;black&quot;, size = 2)</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+</div>
+<div id="wilcoxon-rank-sum-test" class="section level2">
+<h2>2. Wilcoxon Rank-sum Test</h2>
+<div id="a-compare-the-residents-and-nursing-house-seniors-medians-level-of-infection-rate" class="section level4">
+<h4>a) compare the residents and nursing house seniors’ medians level of infection rate</h4>
+</div>
+<div id="b-compare-the-residents-and-nursing-house-seniors-medians-level-of-case-fatality-rate" class="section level4">
+<h4>b) compare the residents and nursing house seniors’ medians level of case fatality rate</h4>
+</div>
+</div>
 
 
 
@@ -328,7 +405,7 @@ $(document).ready(function () {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();

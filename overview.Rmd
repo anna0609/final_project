@@ -2,6 +2,89 @@
 title: "overview"
 output:
   html_document
+    toc:true
+    toc_float:true
 ---
 
+<<<<<<< HEAD
+=======
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+library(ggplot2)
+library(plotly)
+library(gganimate)
+```
+
+# NH Home overview
+
+```{r}
+# read in raw data "overall_df.csv"
+overall_df = 
+  read.csv("./data/overall_df_2020.11.27.csv") %>% 
+  janitor::clean_names()
+```
+
+```{r}
+# explore the trend of new cases per month
+NH_newcase_permonth =
+  overall_df %>% 
+  select(month, county, residents_covid19_cases_per_month)
+
+County_newcase_permonth = 
+  overall_df %>% 
+  select(month, county, monthly_new_positives)
+
+monthly_new_cases =
+ggplot() +
+  geom_point(data = NH_newcase_permonth, aes(x = month, y = residents_covid19_cases_per_month), color = "blue") +
+  geom_point(data = County_newcase_permonth, aes(x = month, y = monthly_new_positives), color = "black") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+monthly_new_cases
+```
+
+```{r}
+# explore the trend of infection rate
+NH_infection_rate =
+  overall_df %>% 
+  select(month, county, county_monthly_prevalence)
+
+County_infection_rate = 
+  overall_df %>% 
+  select(month, county, monthly_infection_rate)
+
+compare_infection_rate =
+ggplot() +
+  geom_point(data = NH_infection_rate, aes(x = county, y = county_monthly_prevalence), color = "blue") +
+  geom_point(data = County_infection_rate, aes(x = county, y = monthly_infection_rate), color = "black") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+compare_infection_rate
+```
+
+```{r}
+# explore the trend of case fatality rate
+NH_case_fatality_rate =
+  overall_df %>% 
+  select(month, county, nh_monthly_fatality_rate)
+
+County_case_fatality_rate = 
+  overall_df %>% 
+  select(month, county, monthly_fatality_rate)
+
+compare_fatality_rate =
+ggplot() +
+  geom_point(data = NH_case_fatality_rate, aes(x = county, y = nh_monthly_fatality_rate), color = "blue") +
+  geom_point(data = County_case_fatality_rate, aes(x = county, y = monthly_fatality_rate), color = "black") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+compare_fatality_rate
+```
+
+
+>>>>>>> 77f8f1b4a65277580776573f3fdfd299dabfe692
 
