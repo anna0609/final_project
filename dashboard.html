@@ -37,6 +37,7 @@ window.FlexDashboardComponents = [];
 <script src="site_libs/featherlight-1.3.5/featherlight.min.js"></script>
 <link href="site_libs/prism-1.4.1/prism.css" rel="stylesheet" />
 <script src="site_libs/prism-1.4.1/prism.js"></script>
+<<<<<<< HEAD
 <script src="site_libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
 <script src="site_libs/plotly-binding-4.9.2.1/plotly.js"></script>
 <script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
@@ -44,6 +45,8 @@ window.FlexDashboardComponents = [];
 <script src="site_libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
 <link href="site_libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
 <script src="site_libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+=======
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
 <style type="text/css">
 
 /*
@@ -87,6 +90,7 @@ body hr {
   min-width: 150px;
   max-height: 500px;
   overflow: auto;
+<<<<<<< HEAD
 }
 
 .chart-wrapper,
@@ -118,6 +122,39 @@ body hr {
   position: relative;
 }
 
+=======
+}
+
+.chart-wrapper,
+.nav-tabs-custom,
+.sbframe-commentary
+{
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 3px;
+  margin-bottom: 8px;
+  margin-right: 8px;
+}
+
+.chart-title {
+  border-bottom: 1px solid #d7d7d7;
+  color: #666;
+  font-size: 14px;
+  font-weight: 300;
+  padding: 7px 10px 4px;
+}
+
+.chart-wrapper .chart-title:empty {
+  display: none;
+}
+
+.chart-wrapper .chart-stage {
+  overflow: hidden;
+  padding: 5px 10px;
+  position: relative;
+}
+
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
 .chart-wrapper .chart-notes {
   background: #fbfbfb;
   border-top: 1px solid #e2e2e2;
@@ -132,6 +169,11 @@ body hr {
 
 #dashboard-container {
   visibility: hidden;
+<<<<<<< HEAD
+}
+
+.tab-content>.dashboard-page-wrapper.active {
+=======
 }
 
 .tab-content>.dashboard-page-wrapper.active {
@@ -166,10 +208,28 @@ body hr {
 }
 
 .dashboard-row {
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+<<<<<<< HEAD
+}
+
+.dashboard-page-wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.dashboard-row-orientation {
+=======
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
   -webkit-flex-direction: row;
@@ -182,6 +242,65 @@ body hr {
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
+}
+
+.dashboard-column-orientation {
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+<<<<<<< HEAD
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.dashboard-row {
+=======
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+
+.dashboard-column {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+<<<<<<< HEAD
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+
+.dashboard-row-flex {
+=======
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.chart-wrapper-flex {
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+<<<<<<< HEAD
 }
 
 .dashboard-column-orientation {
@@ -302,6 +421,93 @@ body hr {
   padding-right: 5px;
 }
 
+=======
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.chart-stage-flex {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  position: relative;
+}
+
+.chart-shim {
+  position: absolute;
+  left: 8px; top: 8px; right: 8px; bottom: 8px;
+}
+
+.no-padding .chart-shim {
+  left: 0; top: 0; right: 0; bottom: 0;
+}
+
+.flowing-content-shim {
+  overflow: auto;
+  left: 0; top: 0; right: 0; bottom: 0;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.flowing-content-container {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.chart-stage .table-bordered {
+  border: none;
+}
+
+.chart-stage .table-bordered > tbody > tr > th,
+.chart-stage .table-bordered > tfoot > tr > th,
+.chart-stage .table-bordered > tbody > tr > td,
+.chart-stage .table-bordered > tfoot > tr > td {
+  border: none;
+}
+
+.chart-stage .table-bordered > tbody > tr > td {
+  border-top: 1px solid #dddddd;
+}
+
+.chart-stage .table-bordered > thead > tr > th {
+  border: none;
+  border-bottom: 2px solid #dddddd;
+}
+
+.bootstrap-table table>thead {
+  background-color: #fff;
+}
+
+.bootstrap-table table.data,
+.bootstrap-table table.shiny-table {
+  width: inherit !important;
+}
+
+.bootstrap-table table.data>tbody>tr>th,
+.bootstrap-table table.shiny-table>tbody>tr>th {
+  border-top: none;
+  border-bottom: 2px solid #dddddd;
+  padding: 5px;
+}
+
+.bootstrap-table .data td[align=right] {
+  font-family: inherit;
+}
+
+.chart-wrapper form {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
 .shiny-input-container label {
   font-weight: normal;
 }
@@ -362,6 +568,7 @@ body hr {
   margin-right: 8px;
   margin-bottom: 8px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+<<<<<<< HEAD
 }
 
 .value-box > .inner {
@@ -378,6 +585,24 @@ body hr {
   padding: 0;
 }
 
+=======
+}
+
+.value-box > .inner {
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.value-box .value {
+  font-size: 38px;
+  font-weight: bold;
+  margin: 0 0 3px 0;
+  white-space: nowrap;
+  padding: 0;
+}
+
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
 .value-box .caption {
   font-size: 15px;
 }
@@ -471,6 +696,7 @@ body hr {
   text-align: left;
   font-size: 14px;
   cursor: pointer;
+<<<<<<< HEAD
 }
 
 .storyboard-nav .sbframelist ul li:last-child {
@@ -492,6 +718,29 @@ body hr {
   padding-left: 22px;
 }
 
+=======
+}
+
+.storyboard-nav .sbframelist ul li:last-child {
+  margin-right: 0px;
+}
+
+.storyboard-nav .sbframelist ul li.active {
+  color: #fff;
+  background: #B8B8B8;
+}
+
+.sbframe-commentary {
+  width: 300px;
+  background: #fbfbfb;
+  font-size: 14px;
+}
+
+.sbframe-commentary ul {
+  padding-left: 22px;
+}
+
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
 .sbframe.active {
   display: flex;
 }
@@ -676,6 +925,7 @@ body hr {
 
 .featherlight-inner {
   width: 100%;
+<<<<<<< HEAD
 }
 
 .featherlight-content pre {
@@ -715,6 +965,47 @@ body hr {
   padding-top: 0;
 }
 
+=======
+}
+
+.featherlight-content pre {
+  margin: 0;
+  border: 0;
+  background: #fff;
+  font-size: 12px;
+}
+
+.unselectable {
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: -moz-none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+#flexdashboard-source-code code {
+  -ms-user-select: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -o-user-select: text;
+  user-select: text;
+}
+
+/* DataTables Tweaks */
+
+.dataTables_filter input[type="search"] {
+  -webkit-appearance: searchfield;
+  outline: none;
+}
+
+.dataTables_wrapper.no-footer
+.dataTables_info {
+  padding-top: 0;
+}
+
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
 
 table.dataTable thead th {
   border-bottom: 1px solid #d7d7d7;
@@ -727,6 +1018,19 @@ table.dataTable thead th {
 /* Mobile phone only CSS */
 
 .desktop-layout div.section.mobile {
+<<<<<<< HEAD
+  display: none;
+}
+
+.mobile-layout div.section.no-mobile {
+  display: none;
+}
+
+.mobile-figure {
+  display: none;
+}
+
+=======
   display: none;
 }
 
@@ -739,6 +1043,68 @@ table.dataTable thead th {
 }
 
 
+
+body {
+  padding-top: 60px;
+}
+
+.section.sidebar {
+  top: 51px;
+  background-color: rgba(39, 128, 227, 0.1);
+}
+
+.value-box {
+  color: #f9f9f9;
+}
+
+.bg-primary {
+  background-color: rgba(39, 128, 227, 0.7);
+}
+
+.storyboard-nav .sbframelist ul li.active {
+  background-color: rgba(39, 128, 227, 0.7);
+}
+
+.nav-tabs-custom > .nav-tabs > li.active {
+  border-top-color: rgba(39, 128, 227, 0.7);
+}
+
+.bg-info {
+  background-color: rgba(153, 84, 187, 0.7);
+}
+
+.bg-warning {
+  background-color: rgba(255, 117, 24, 0.7);
+}
+
+.bg-danger {
+  background-color: rgba(255, 0, 57, 0.7);
+}
+
+.bg-success {
+  background-color: rgba(63, 182, 24, 0.7);
+}
+
+.chart-title {
+  font-weight: 500;
+}
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
+
+.nav-tabs-custom > .nav-tabs > li > a,
+.nav-tabs-custom > .nav-tabs > li > a:active {
+  font-weight: 500;
+}
+
+@media only screen and (min-width: 768px) {
+html, body {
+  height: 100%;
+}
+
+#dashboard-container {
+  height: 100%;
+}
+}
+</style>
 
 body {
   padding-top: 60px;
@@ -2627,6 +2993,7 @@ window.FlexDashboardComponents.push({
 </script>
 
 <div id="dashboard-container">
+<<<<<<< HEAD
 
 <div id="row" class="section level2" data-width="350">
 <h2>Row</h2>
@@ -2648,6 +3015,11 @@ window.FlexDashboardComponents.push({
 </div>
 </div>
 
+=======
+
+
+
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
 </div>
 
 <script>
@@ -2682,6 +3054,7 @@ library(tidyverse)
 library(plotly)
 ```
 
+<<<<<<< HEAD
 Row {data-width=350}
 -----------------------------------------------------------------------
 
@@ -2708,6 +3081,8 @@ ggplotly(
   geom_line()
 )
 ```
+=======
+>>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
 </code></pre>
 </div>
 <script type="text/javascript">
