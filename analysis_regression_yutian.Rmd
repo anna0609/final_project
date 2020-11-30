@@ -19,35 +19,37 @@ library(stargazer)
 ```{r}
 
 my_data =
-read_csv("./data/overall_df.csv") %>%
+read_csv("./data/final_df.csv") %>%
   janitor::clean_names() %>% 
   relocate(election_result) %>% 
-  mutate(
-   election_result = recode(election_result, "D" = "1", "R" = "0")
-   ) %>% 
+
   mutate(
     election_result = as.factor(election_result),
     total_supply_ppe_monthly = as.factor(total_supply_ppe_monthly),
     total_shortage_stuff_monthly = as.factor(total_shortage_stuff_monthly),
     ventilator_dependent_unit_monthly = as.factor(ventilator_dependent_unit_monthly)
     ) %>% 
-  select(-county,-month) %>% 
-  drop_na(nh_monthly_fatality_rate, election_result) %>% 
-  filter_all(all_vars(is.finite(.)))
+  
+  mutate(
+    nh_occupancy_rate = ifelse(nh_occupancy_rate >= 1, NA, nh_occupancy_rate)
+  ) %>% 
+
+
+  drop_na(nh_monthly_fatality_rate, staff_flu_vaccination_rate,nh_occupancy_rate) %>% 
+  filter((is.finite(nh_monthly_fatality_rate)))
 
 ```
 
 
-MLR model
+MLR model: predict nh fatality
 
 ```{r fit model}
 
-# MLR1: nh fatality
+# MLR1: y = nh_fatality
 fit1 = 
   lm(
     nh_monthly_fatality_rate 
-    ~ county_prevalence + 
-      nh_occupancy_rate + 
+    ~ nh_occupancy_rate + 
       election_result + 
       staff_flu_vaccination_rate + 
       ventilator_dependent_unit_monthly + 
@@ -66,6 +68,87 @@ summary(fit2)
 
 ```
 
+MLR model: predict county monthly prevalence
+
+```{r}
+
+# all potential predictors
+multi_fit =
+  lm(county_monthly_prevalence
+     ~ election_result
+     + nh_monthly_fatality_rate
+     + nh_occupancy_rate
+     + staff_flu_vaccination_rate
+     + total_shortage_stuff_monthly
+     + ventilator_dependent_unit_monthly
+     + monthly_infection_rate
+     + monthly_fatality_rate,
+     
+     data = my_data
+  )
+summary(multi_fit)
+
+# backward elimination
+step1 = update(multi_fit, . ~ . -nh_monthly_fatality_rate)
+summary(step1)
+
+#step2
+step2 = update(step1, .~. -total_shortage_stuff_monthly)
+summary(step2)
+
+#step3
+step3 = update(step2, .~. -staff_flu_vaccination_rate)
+summary(step3)
+
+# stpe4
+step4 = update(step3, .~. -election_result)
+summary(step4)
+
+# step5
+step5 = update(step4, .~. -nh_occupancy_rate)
+summary(step5)
+
+# diagnostics
+# diagnostic MLR
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+plot(step5)
+
+# test heteroskedasticity
+bptest(step5)
+```
+
+
+```{r}
+# MLR: x = election
+
+fit3 = 
+  lm(
+    county_monthly_prevalence
+    ~
+    monthly_fatality_rate
+    + county_monthly_occupancy,
+    data = my_data
+  )
+summary(fit3)
+
+
+# MLR: x = 
+
+fit4 = 
+  lm(
+    county_monthly_prevalence
+    ~monthly_fatality_rate
+    + county_monthly_occupancy
+    + nh_occupancy_rate,
+    data = my_data
+  )
+summary(fit4)
+
+```
+
+
+
+
 diagnostics
 
 ```{r}
@@ -75,9 +158,6 @@ layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page
 plot(fit1)
 
 
-# tables for fit res
-coefficients(fit1)
-anova(fit1)
 
 ```
 
