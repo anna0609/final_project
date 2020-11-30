@@ -1,0 +1,130 @@
+---
+title: "Untitled"
+author: "Yutian Luo"
+date: "11/29/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(AER)
+library(plm)
+library(stargazer)
+```
+
+##1. using my_data to create simple MLR
+
+```{r}
+
+my_data =
+read_csv("./data/overall_df.csv") %>%
+  janitor::clean_names() %>% 
+  relocate(election_result) %>% 
+  mutate(
+   election_result = recode(election_result, "D" = "1", "R" = "0")
+   ) %>% 
+  mutate(
+    election_result = as.factor(election_result),
+    total_supply_ppe_monthly = as.factor(total_supply_ppe_monthly),
+    total_shortage_stuff_monthly = as.factor(total_shortage_stuff_monthly),
+    ventilator_dependent_unit_monthly = as.factor(ventilator_dependent_unit_monthly)
+    ) %>% 
+  select(-county,-month) %>% 
+  drop_na(nh_monthly_fatality_rate, election_result) %>% 
+  filter_all(all_vars(is.finite(.)))
+
+```
+
+
+MLR model
+
+```{r fit model}
+
+# MLR1: nh fatality
+fit1 = 
+  lm(
+    nh_monthly_fatality_rate 
+    ~ county_prevalence + 
+      nh_occupancy_rate + 
+      election_result + 
+      staff_flu_vaccination_rate + 
+      ventilator_dependent_unit_monthly + 
+      monthly_infection_rate +
+      monthly_fatality_rate, 
+    data=my_data)
+summary(fit1) # show results
+
+# MLR2: nh fatality
+fit2 = 
+  lm(
+    nh_monthly_fatality_rate
+    ~ ventilator_dependent_unit_monthly,
+    data = my_data)
+summary(fit2)
+
+```
+
+diagnostics
+
+```{r}
+
+# diagnostic MLR
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+plot(fit1)
+
+
+# tables for fit res
+coefficients(fit1)
+anova(fit1)
+
+```
+
+
+
+## 2. using my_data as Longitudinal to create MLR
+
+```{r}
+
+my_data_panel =
+read_csv("./data/overall_df.csv") %>%
+  janitor::clean_names() %>% 
+  relocate(election_result) %>% 
+  mutate(
+   election_result = recode(election_result, "D" = "1", "R" = "0")
+   ) %>% 
+  mutate(
+    county = as.factor(county),
+    month = as.factor(month),
+    election_result = as.factor(election_result),
+    total_supply_ppe_monthly = as.factor(total_supply_ppe_monthly),
+    total_shortage_stuff_monthly = as.factor(total_shortage_stuff_monthly),
+    ventilator_dependent_unit_monthly = as.factor(ventilator_dependent_unit_monthly)
+    ) %>% 
+  drop_na(nh_monthly_fatality_rate) %>% 
+  filter_all(all_vars(is.finite(.)))
+```
+
+
+panel data MLR
+
+```{r}
+
+month_vec = c("5","6","7","8","9","10")
+
+fatal_sub = 
+  map(.x = month_vec, ~subset(my_data_panel, month == .x))
+
+fit3 = 
+  lm(
+    nh_monthly_fatality_rate
+    ~ election_result,
+    data = fatal_sub[[1]]
+  )
+summary(fit3)
+
+```
+
+
+

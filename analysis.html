@@ -22,8 +22,6 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
-<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -34,7 +32,7 @@
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-    </style>
+      </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -297,6 +295,9 @@ $(document).ready(function () {
   <a href="dashboard.html">Nusing Home Trends</a>
 </li>
 <li>
+  <a href="mapping.html">Mapping</a>
+</li>
+<li>
   <a href="analysis.html">Analysis</a>
 </li>
 <li>
@@ -332,6 +333,7 @@ $(document).ready(function () {
 <div id="correlation-matrix" class="section level2">
 <h2>1. Correlation Matrix</h2>
 <pre class="r"><code>library(tidyverse)
+<<<<<<< HEAD
 library(corrplot)
 library(&quot;Hmisc&quot;)
 library(&quot;PerformanceAnalytics&quot;)</code></pre>
@@ -367,6 +369,17 @@ read_csv(&quot;./data/county_poll.csv&quot;)</code></pre>
 <pre class="r"><code>final_df =
 left_join(data1, data2, by = &quot;county&quot;)
 write_csv(final_df, path = &quot;./data/final_df.csv&quot;)</code></pre>
+=======
+library(corrplot)</code></pre>
+<pre><code>## Warning: package &#39;corrplot&#39; was built under R version 4.0.3</code></pre>
+<pre class="r"><code>library(&quot;Hmisc&quot;)</code></pre>
+<pre><code>## Warning: package &#39;Hmisc&#39; was built under R version 4.0.3</code></pre>
+<pre><code>## Warning: package &#39;Formula&#39; was built under R version 4.0.3</code></pre>
+<pre class="r"><code>library(&quot;PerformanceAnalytics&quot;)</code></pre>
+<pre><code>## Warning: package &#39;PerformanceAnalytics&#39; was built under R version 4.0.3</code></pre>
+<pre><code>## Warning: package &#39;xts&#39; was built under R version 4.0.3</code></pre>
+<pre><code>## Warning: package &#39;zoo&#39; was built under R version 4.0.3</code></pre>
+>>>>>>> 356e48d67337bb87f856d74c334c1ca28a340dd8
 <pre class="r"><code>my_data =
 read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;% 
@@ -541,7 +554,7 @@ res</code></pre>
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();

@@ -13,3 +13,29 @@ library(tidyverse)
 library(plotly)
 ```
 
+Row {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r message=FALSE}
+ggplotly(
+  read_csv("./data/overall_df_2020.11.27.csv") %>%
+  janitor::clean_names() %>%
+  ggplot(aes(month, monthly_infection_rate, color = county)) +
+  scale_x_continuous(limits = c(5, 9)) + 
+  geom_line()
+)
+```
+
+### Chart B
+
+```{r message=FALSE}
+ggplotly(
+  read_csv("./data/overall_df_2020.11.27.csv") %>%
+  janitor::clean_names() %>%
+  ggplot(aes(month, monthly_fatality_rate, color = county)) +
+  scale_x_continuous(limits = c(5, 9)) + 
+  geom_line()
+)
+```
