@@ -132,8 +132,7 @@ summary(fit3)
 fit4 = 
   lm(
     county_prevalence
-    ~ election_result +
-      
+    ~ election_result,
     data = my_data
   )
 summary(fit4)
