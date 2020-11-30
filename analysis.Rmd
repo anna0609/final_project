@@ -13,6 +13,7 @@ library(corrplot)
 library("Hmisc")
 library("PerformanceAnalytics")
 ```
+
 ```{r, message=FALSE}
 my_data =
 read_csv("./data/overall_df.csv") %>%
@@ -67,5 +68,59 @@ geom_text(aes(x=row, y=column, label=cor), color = "black", size = 2)
 
 ## 2. Wilcoxon Rank-sum Test 
 
-#### a) compare the residents and nursing house seniors’ medians level of infection rate
-#### b) compare the residents and nursing house seniors’ medians level of case fatality rate
+### Compare the NYC residents and nursing home seniors’ medians level of fatality rate.
+
+#### test normality
+
+```{r, message=FALSE}
+library(rvest)
+library(lattice)
+library(faraway)
+library(broom)
+```
+
+```{r, message=FALSE}
+nursing_house_df =
+read_csv("./data/overall_df.csv") %>%
+  janitor::clean_names() %>% 
+  select(nh_monthly_fatality_rate) %>% 
+  drop_na() %>% 
+  filter_all(all_vars(!is.infinite(.)))
+
+
+ residents_df =
+read_csv("./data/overall_df.csv") %>%
+  janitor::clean_names() %>% 
+  select(monthly_fatality_rate) %>% 
+  drop_na()
+```
+
+```{r, message=FALSE}
+par(mfrow=c(2,2))
+hist(nursing_house_df$nh_monthly_fatality_rate, xlab = "nh_monthly_fatality_rate", freq=T, main="nursing home monthly fatality rate")
+hist(residents_df$monthly_fatality_rate, xlab = "monthly_fatality_rate", freq=T, main="residents monthly fatality rate")
+
+qqnorm(nursing_house_df$nh_monthly_fatality_rate, col=2, pch=19, cex=1.5)
+qqline(nursing_house_df$nh_monthly_fatality_rate, col = 1,lwd=2,lty=2)
+
+qqnorm(residents_df$monthly_fatality_rate, col=2, pch=19, cex=1.5)
+qqline(residents_df$monthly_fatality_rate, col = 1,lwd=2,lty=2)
+```
+
+
+From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly fatality rate and residents monthly fatality rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:
+
+H0: The medians level of monthly fatality rate are the same for NYC residents and nursing home seniors.
+
+Ha:  The medians level of monthly fatality rate are different for NYC residents and nursing home seniors.
+
+```{r, message=FALSE}
+res <- wilcox.test(nursing_house_df$nh_monthly_fatality_rate, residents_df$monthly_fatality_rate, mu=0)
+nursing_house_df %>% count()
+residents_df %>% count()
+res$statistic<-res$statistic + 300*(300+1)/2
+res
+```
+
+From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 0.3194 > 0.05. Therefore, we fail to reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the same for NYC residents and nursing home seniors.
+

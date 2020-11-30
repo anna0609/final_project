@@ -1,0 +1,41 @@
+---
+title: "NY State Nursing Homes in Covid-19 pandemic"
+output: 
+  html_document
+---
+
+
+```{r include = FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+```{r echo = FALSE, include = FALSE}
+county_poll = read_excel("./data/nycounty_results.xlsx") %>%
+  janitor::clean_names() %>%
+  mutate(
+    results = ifelse(biden_pct > 0.5, "D", "R") #D stands for Democratic party win and R stands for Republican Party win
+  ) %>%
+  select(county, results)
+
+county_poll
+```
+
+```{r echo = FALSE, include = FALSE}
+testing_df = read_csv("./data/New_York_State_Statewide_COVID-19_Testing.csv") %>%
+  janitor::clean_names()
+```
+
+### Comparing nursing homes' situations of each county to that of the whole country
+
+#### Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km3624), Yutian Luo(yl4608)
+
+
+![](./pictures/cover.jpg)
+
+
+### Website Navigation
+* <b>Overview</b>: Multiple trend comparisons between nursing homes(county as unit) and the whole country
+* <b>Nursing Home Trends</b>: Multiple trend comparisons of nursing homes between different counties
+* <b>Analysis</b>: Includes non-parametric tests / linear regression analysis
+* <b>Fun Explorations</b>: Discuss other factors, such as political influence and nursing home facility, and how they may relate to the situations in NY nursing homes

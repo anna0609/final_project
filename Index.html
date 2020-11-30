@@ -11,7 +11,7 @@
 
 
 
-<title>overview</title>
+<title>NY State Nursing Homes in Covid-19 pandemic</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,8 +22,6 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
-<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -34,7 +32,7 @@
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-    </style>
+      </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -326,104 +324,26 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">overview</h1>
+<h1 class="title toc-ignore">NY State Nursing Homes in Covid-19 pandemic</h1>
 
 </div>
 
 
-<div id="head" class="section level1">
-<h1>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</h1>
-<pre class="r"><code>library(tidyverse)
-library(p8105.datasets)
-library(ggplot2)
-library(plotly)
-library(gganimate)</code></pre>
-<<<<<<< HEAD
-<pre><code>## Warning: package &#39;gganimate&#39; was built under R version 4.0.3</code></pre>
-=======
->>>>>>> e0900439ab13b4684b9c2702494f53558a2e5da5
+<div id="comparing-nursing-homes-situations-of-each-county-to-that-of-the-whole-country" class="section level3">
+<h3>Comparing nursing homes’ situations of each county to that of the whole country</h3>
+<div id="jianting-shijs5095-minjie-baomb4757-pangsibo-shenps3194-phoebe-mokm3624-yutian-luoyl4608" class="section level4">
+<h4>Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km3624), Yutian Luo(yl4608)</h4>
+<p><img src="pictures/cover.jpg" /></p>
 </div>
-<div id="nh-home-overview" class="section level1">
-<h1>NH Home overview</h1>
-<pre class="r"><code># read in raw data &quot;overall_df.csv&quot;
-overall_df = 
-  read.csv(&quot;./data/overall_df_2020.11.27.csv&quot;) %&gt;% 
-  janitor::clean_names()</code></pre>
-<pre class="r"><code># explore the trend of new cases per month
-NH_newcase_permonth =
-  overall_df %&gt;% 
-  select(month, county, residents_covid19_cases_per_month)
-
-County_newcase_permonth = 
-  overall_df %&gt;% 
-  select(month, county, monthly_new_positives)
-
-monthly_new_cases =
-ggplot() +
-  geom_point(data = NH_newcase_permonth, aes(x = month, y = residents_covid19_cases_per_month), color = &quot;blue&quot;) +
-  geom_point(data = County_newcase_permonth, aes(x = month, y = monthly_new_positives), color = &quot;black&quot;) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  theme(legend.position = &quot;right&quot;) 
-
-monthly_new_cases</code></pre>
-<pre><code>## Warning: Removed 38 rows containing missing values (geom_point).</code></pre>
-<pre><code>## Warning: Removed 60 rows containing missing values (geom_point).</code></pre>
-<p><img src="overview_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<pre class="r"><code># explore the trend of infection rate
-NH_infection_rate =
-  overall_df %&gt;% 
-  select(month, county, county_monthly_prevalence)
-
-County_infection_rate = 
-  overall_df %&gt;% 
-  select(month, county, monthly_infection_rate)
-
-compare_infection_rate =
-ggplot() +
-  geom_point(data = NH_infection_rate, aes(x = county, y = county_monthly_prevalence), color = &quot;blue&quot;) +
-  geom_point(data = County_infection_rate, aes(x = county, y = monthly_infection_rate), color = &quot;black&quot;) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  theme(legend.position = &quot;right&quot;) 
-
-compare_infection_rate</code></pre>
-<pre><code>## Warning: Removed 49 rows containing missing values (geom_point).</code></pre>
-<pre><code>## Warning: Removed 60 rows containing missing values (geom_point).</code></pre>
-<p><img src="overview_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<pre class="r"><code># explore the trend of case fatality rate
-NH_case_fatality_rate =
-  overall_df %&gt;% 
-  select(month, county, nh_monthly_fatality_rate)
-
-County_case_fatality_rate = 
-  overall_df %&gt;% 
-  select(month, county, monthly_fatality_rate)
-
-compare_fatality_rate =
-ggplot() +
-  geom_point(data = NH_case_fatality_rate, aes(x = county, y = nh_monthly_fatality_rate), color = &quot;blue&quot;) +
-  geom_point(data = County_case_fatality_rate, aes(x = county, y = monthly_fatality_rate), color = &quot;black&quot;) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  theme(legend.position = &quot;right&quot;) 
-
-compare_fatality_rate</code></pre>
-<pre><code>## Warning: Removed 180 rows containing missing values (geom_point).</code></pre>
-<pre><code>## Warning: Removed 60 rows containing missing values (geom_point).</code></pre>
-<p><img src="overview_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>77f8f1b4a65277580776573f3fdfd299dabfe692</p>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
+</div>
+<div id="website-navigation" class="section level3">
+<h3>Website Navigation</h3>
+<ul>
+<li><b>Overview</b>: Multiple trend comparisons between nursing homes(county as unit) and the whole country</li>
+<li><b>Nursing Home Trends</b>: Multiple trend comparisons of nursing homes between different counties</li>
+<li><b>Analysis</b>: Includes non-parametric tests / linear regression analysis</li>
+<li><b>Fun Explorations</b>: Discuss other factors, such as political influence and nursing home facility, and how they may relate to the situations in NY nursing homes</li>
+</ul>
 </div>
 
 
@@ -435,7 +355,7 @@ compare_fatality_rate</code></pre>
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();

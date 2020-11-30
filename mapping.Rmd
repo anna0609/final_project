@@ -1,17 +1,36 @@
 ---
-title: "mapping"
-author: "Pangsibo Shen"
-date: "11/29/2020"
-output: html_document
+title: "COVID-19 Map For New York in May 2020"
+output:
+  html_document:
+    code_folding: hide
 ---
-```{r}
+```{r warning=FALSE, message=FALSE, echo = FALSE}
 library(tidyverse)
 library(leaflet)
+library(knitr)
+opts_chunk$set(fig.width = 11, fig.height = 7)
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 county_seats = read_csv("./data/County_Seats.csv") %>%
   janitor::clean_names() %>%
   select(c("county","city","longitude","latitude"))
-```
 
+mapping_df = read_csv("./data/overall_df_2020.11.27.csv") %>%
+  janitor::clean_names() %>%
+  select(month,county,monthly_infection_rate,monthly_fatality_rate) %>%
+  filter(month == 5) %>%
+  left_join(county_seats, by = "county") %>%
+  mutate(
+    click_label = 
+      str_c("<b>", county,", ", city, "</b><br>Infection Rate: ",monthly_infection_rate, "</b><br>Fatality Rate: ", monthly_fatality_rate)) 
+
+pal <- colorNumeric(
+  palette = "red",
+  domain = mapping_df$monthly_fatality_rate)
+
+mapping_df %>%
+  leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircleMarkers(~longitude, ~latitude, radius = ~monthly_infection_rate*100, stroke = FALSE, fillOpacity = 0.5, color = ~pal(monthly_fatality_rate), popup = ~click_label)
+```

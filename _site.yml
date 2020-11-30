@@ -3,12 +3,14 @@ output_dir: "."
 navbar:
   title: "Home"
   right:
-    - text: "ABOUT"
+    - text: "About"
       href: about.html
     - text: "Overview"
       href: overview.html
     - text: "Nusing Home Trends"
       href: dashboard.html
+    - text: "Mapping"
+      href: mapping.html
     - text: "Analysis"
       href: analysis.html
     - text: "Fun Explorations"
