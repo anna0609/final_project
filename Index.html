@@ -11,7 +11,7 @@
 
 
 
-<title>Analysis</title>
+<title>NY State Nursing Homes in Covid-19 pandemic</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -324,83 +324,26 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Analysis</h1>
+<h1 class="title toc-ignore">NY State Nursing Homes in Covid-19 pandemic</h1>
 
 </div>
 
 
-<p>In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.</p>
-<div id="correlation-matrix" class="section level2">
-<h2>1. Correlation Matrix</h2>
-<pre class="r"><code>library(tidyverse)
-library(corrplot)</code></pre>
-<pre><code>## Warning: package &#39;corrplot&#39; was built under R version 4.0.3</code></pre>
-<pre class="r"><code>library(&quot;Hmisc&quot;)</code></pre>
-<pre><code>## Warning: package &#39;Hmisc&#39; was built under R version 4.0.3</code></pre>
-<pre><code>## Warning: package &#39;Formula&#39; was built under R version 4.0.3</code></pre>
-<pre class="r"><code>library(&quot;PerformanceAnalytics&quot;)</code></pre>
-<pre><code>## Warning: package &#39;PerformanceAnalytics&#39; was built under R version 4.0.3</code></pre>
-<pre><code>## Warning: package &#39;xts&#39; was built under R version 4.0.3</code></pre>
-<pre><code>## Warning: package &#39;zoo&#39; was built under R version 4.0.3</code></pre>
-<pre class="r"><code>my_data =
-read_csv(&quot;./data/overall_df.csv&quot;) %&gt;%
-  janitor::clean_names() %&gt;% 
-  relocate(election_result) %&gt;% 
-  mutate(
-   election_result = recode(election_result, &quot;D&quot; = &quot;1&quot;, &quot;R&quot; = &quot;0&quot;)
-   ) %&gt;% 
-  mutate(election_result = as.numeric(election_result)) %&gt;% 
-  select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
-
-res = cor(my_data, use = &quot;complete.obs&quot;) #handle missing value
-
-res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
-  
-# Extract the correlation coefficients：res2$r
-# Extract p-values：res2$P
-
-# format the correlation matrix
-flattenCorrMatrix &lt;- function(cormat, pmat) {
-  ut &lt;- upper.tri(cormat)
-  data.frame(
-    row = rownames(cormat)[row(cormat)[ut]],
-    column = rownames(cormat)[col(cormat)[ut]],
-    cor  =(cormat)[ut],
-    p = pmat[ut]
-    )
-}
-
-res2 = rcorr(as.matrix(my_data[,1:14]))
-tidy_df = 
-  flattenCorrMatrix(res2$r, res2$P) %&gt;%
-  mutate_if(is.numeric, ~round(., 2))
-
-#display a chart of a correlation matrix
-#chart.Correlation(my_data, histogram=TRUE, pch=19)
-# heat map
-col&lt;- colorRampPalette(c(&quot;blue&quot;, &quot;white&quot;, &quot;red&quot;))(20)
-heatmap(x = res, col = col, symm = TRUE)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<pre class="r"><code>ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
- geom_tile(color = &quot;white&quot;)+
- scale_fill_gradient2(low = &quot;blue&quot;, high = &quot;red&quot;, mid = &quot;white&quot;, 
-   midpoint = 0, limit = c(-1,1), space = &quot;Lab&quot;, 
-   name=&quot;Pearson\nCorrelation&quot;) +
-  theme_minimal()+ 
- theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-    size = 12, hjust = 1))+
- coord_fixed() + 
-geom_text(aes(x=row, y=column, label=cor), color = &quot;black&quot;, size = 2)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<div id="comparing-nursing-homes-situations-of-each-county-to-that-of-the-whole-country" class="section level3">
+<h3>Comparing nursing homes’ situations of each county to that of the whole country</h3>
+<div id="jianting-shijs5095-minjie-baomb4757-pangsibo-shenps3194-phoebe-mokm3624-yutian-luoyl4608" class="section level4">
+<h4>Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km3624), Yutian Luo(yl4608)</h4>
+<p><img src="pictures/cover.jpg" /></p>
 </div>
-<div id="wilcoxon-rank-sum-test" class="section level2">
-<h2>2. Wilcoxon Rank-sum Test</h2>
-<div id="a-compare-the-residents-and-nursing-house-seniors-medians-level-of-infection-rate" class="section level4">
-<h4>a) compare the residents and nursing house seniors’ medians level of infection rate</h4>
 </div>
-<div id="b-compare-the-residents-and-nursing-house-seniors-medians-level-of-case-fatality-rate" class="section level4">
-<h4>b) compare the residents and nursing house seniors’ medians level of case fatality rate</h4>
-</div>
+<div id="website-navigation" class="section level3">
+<h3>Website Navigation</h3>
+<ul>
+<li><b>Overview</b>: Multiple trend comparisons between nursing homes(county as unit) and the whole country</li>
+<li><b>Nursing Home Trends</b>: Multiple trend comparisons of nursing homes between different counties</li>
+<li><b>Analysis</b>: Includes non-parametric tests / linear regression analysis</li>
+<li><b>Fun Explorations</b>: Discuss other factors, such as political influence and nursing home facility, and how they may relate to the situations in NY nursing homes</li>
+</ul>
 </div>
 
 
