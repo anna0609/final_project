@@ -388,11 +388,61 @@ geom_text(aes(x=row, y=column, label=cor), color = &quot;black&quot;, size = 2)<
 </div>
 <div id="wilcoxon-rank-sum-test" class="section level2">
 <h2>2. Wilcoxon Rank-sum Test</h2>
-<div id="a-compare-the-residents-and-nursing-house-seniors-medians-level-of-infection-rate" class="section level4">
-<h4>a) compare the residents and nursing house seniors’ medians level of infection rate</h4>
+<div id="compare-the-nyc-residents-and-nursing-home-seniors-medians-level-of-fatality-rate." class="section level3">
+<h3>Compare the NYC residents and nursing home seniors’ medians level of fatality rate.</h3>
+<div id="test-normality" class="section level4">
+<h4>test normality</h4>
+<pre class="r"><code>library(rvest)
+library(lattice)
+library(faraway)
+library(broom)</code></pre>
+<pre class="r"><code>nursing_house_df =
+read_csv(&quot;./data/overall_df.csv&quot;) %&gt;%
+  janitor::clean_names() %&gt;% 
+  select(nh_monthly_fatality_rate) %&gt;% 
+  drop_na() %&gt;% 
+  filter_all(all_vars(!is.infinite(.)))
+
+
+ residents_df =
+read_csv(&quot;./data/overall_df.csv&quot;) %&gt;%
+  janitor::clean_names() %&gt;% 
+  select(monthly_fatality_rate) %&gt;% 
+  drop_na()</code></pre>
+<pre class="r"><code>par(mfrow=c(2,2))
+hist(nursing_house_df$nh_monthly_fatality_rate, xlab = &quot;nh_monthly_fatality_rate&quot;, freq=T, main=&quot;nursing home monthly fatality rate&quot;)
+hist(residents_df$monthly_fatality_rate, xlab = &quot;monthly_fatality_rate&quot;, freq=T, main=&quot;residents monthly fatality rate&quot;)
+
+qqnorm(nursing_house_df$nh_monthly_fatality_rate, col=2, pch=19, cex=1.5)
+qqline(nursing_house_df$nh_monthly_fatality_rate, col = 1,lwd=2,lty=2)
+
+qqnorm(residents_df$monthly_fatality_rate, col=2, pch=19, cex=1.5)
+qqline(residents_df$monthly_fatality_rate, col = 1,lwd=2,lty=2)</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly fatality rate and residents monthly fatality rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:</p>
+<p>H0: The medians level of monthly fatality rate are the same for NYC residents and nursing home seniors.</p>
+<p>Ha: The medians level of monthly fatality rate are different for NYC residents and nursing home seniors.</p>
+<pre class="r"><code>res &lt;- wilcox.test(nursing_house_df$nh_monthly_fatality_rate, residents_df$monthly_fatality_rate, mu=0)
+nursing_house_df %&gt;% count()</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##       n
+##   &lt;int&gt;
+## 1   172</code></pre>
+<pre class="r"><code>residents_df %&gt;% count()</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##       n
+##   &lt;int&gt;
+## 1   300</code></pre>
+<pre class="r"><code>res$statistic&lt;-res$statistic + 300*(300+1)/2
+res</code></pre>
+<pre><code>## 
+##  Wilcoxon rank sum test with continuity correction
+## 
+## data:  nursing_house_df$nh_monthly_fatality_rate and residents_df$monthly_fatality_rate
+## W = 72365, p-value = 0.3194
+## alternative hypothesis: true location shift is not equal to 0</code></pre>
+<p>From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 0.3194 &gt; 0.05. Therefore, we fail to reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the same for NYC residents and nursing home seniors.</p>
 </div>
-<div id="b-compare-the-residents-and-nursing-house-seniors-medians-level-of-case-fatality-rate" class="section level4">
-<h4>b) compare the residents and nursing house seniors’ medians level of case fatality rate</h4>
 </div>
 </div>
 
