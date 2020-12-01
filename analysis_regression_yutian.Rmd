@@ -12,9 +12,14 @@ library(tidyverse)
 library(AER)
 library(plm)
 library(stargazer)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+library(ggplot2)
+library(gridExtra)
 ```
 
-##1. using my_data to create simple MLR
+##1. Panel Data MLR
 
 ```{r}
 
@@ -22,55 +27,25 @@ my_data =
 read_csv("./data/final_df.csv") %>%
   janitor::clean_names() %>% 
   relocate(election_result) %>% 
-
   mutate(
-    election_result = as.factor(election_result),
-    total_supply_ppe_monthly = as.factor(total_supply_ppe_monthly),
-    total_shortage_stuff_monthly = as.factor(total_shortage_stuff_monthly),
-    ventilator_dependent_unit_monthly = as.factor(ventilator_dependent_unit_monthly)
-    ) %>% 
+   election_result = recode(election_result, "D" = "1", "R" = "0", as.numeric = TRUE)
+   ) %>% 
   
   mutate(
     nh_occupancy_rate = ifelse(nh_occupancy_rate >= 1, NA, nh_occupancy_rate)
   ) %>% 
 
 
-  drop_na(nh_monthly_fatality_rate, staff_flu_vaccination_rate,nh_occupancy_rate) %>% 
+  drop_na(nh_monthly_fatality_rate,
+          staff_flu_vaccination_rate,nh_occupancy_rate) %>% 
   filter((is.finite(nh_monthly_fatality_rate)))
 
 ```
 
 
-MLR model: predict nh fatality
+MLR model: panel data regression using backward elimination
 
-```{r fit model}
-
-# MLR1: y = nh_fatality
-fit1 = 
-  lm(
-    nh_monthly_fatality_rate 
-    ~ nh_occupancy_rate + 
-      election_result + 
-      staff_flu_vaccination_rate + 
-      ventilator_dependent_unit_monthly + 
-      monthly_infection_rate +
-      monthly_fatality_rate, 
-    data=my_data)
-summary(fit1) # show results
-
-# MLR2: nh fatality
-fit2 = 
-  lm(
-    nh_monthly_fatality_rate
-    ~ ventilator_dependent_unit_monthly,
-    data = my_data)
-summary(fit2)
-
-```
-
-MLR model: predict county monthly prevalence
-
-```{r}
+```{r mlr models panel data}
 
 # all potential predictors
 multi_fit =
@@ -115,107 +90,47 @@ plot(step5)
 
 # test heteroskedasticity
 bptest(step5)
-```
 
-
-```{r}
-# MLR: x = election
-
-fit3 = 
-  lm(
-    county_monthly_prevalence
-    ~
-    monthly_fatality_rate
-    + county_monthly_occupancy,
-    data = my_data
-  )
-summary(fit3)
-
-
-# MLR: x = 
-
-fit4 = 
-  lm(
-    county_monthly_prevalence
-    ~monthly_fatality_rate
-    + county_monthly_occupancy
-    + nh_occupancy_rate,
-    data = my_data
-  )
-summary(fit4)
-
+# summary table
+mlr_tab1 = 
+  tab_model(step5, step4, step3, step2, step1, show.p = TRUE, show.ci = FALSE)
 ```
 
 
 
+# 2. Simple MLR 
 
-diagnostics
+MLR stepAIC
 
 ```{r}
 
-# diagnostic MLR
+# filter entity and states
+no.na.data = 
+  my_data %>% 
+  na.omit() %>% 
+  select(
+    -county,
+    -month
+  )
+
+# step AIC regression
+aic_res <- lm(county_monthly_prevalence ~ ., data=no.na.data)
+step_ml = step(aic_res, direction='backward')
+
+summary(step_ml)
+
+
+# diagnostics
 layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
-plot(fit1)
+plot(step_ml)
 
+# test heteroskedasticity
+bptest(step_ml)
 
+# summary table
+mlr_tab2 = 
+  tab_model(step_ml, show.p = TRUE, show.ci = FALSE)
 
-```
-
-
-
-## 2. using my_data as Longitudinal to create MLR
-
-```{r}
-
-my_data_panel =
-read_csv("./data/overall_df.csv") %>%
-  janitor::clean_names() %>% 
-  relocate(election_result) %>% 
-  mutate(
-   election_result = recode(election_result, "D" = "1", "R" = "0")
-   ) %>% 
-  mutate(
-    county = as.factor(county),
-    month = as.factor(month),
-    election_result = as.factor(election_result),
-    total_supply_ppe_monthly = as.factor(total_supply_ppe_monthly),
-    total_shortage_stuff_monthly = as.factor(total_shortage_stuff_monthly),
-    ventilator_dependent_unit_monthly = as.factor(ventilator_dependent_unit_monthly)
-    ) %>% 
-  drop_na(nh_monthly_fatality_rate) %>% 
-  filter_all(all_vars(is.finite(.)))
-```
-
-
-panel data MLR
-
-```{r}
-
-month_vec = c("5","6","7","8","9","10")
-
-fatal_sub = 
-  map(.x = month_vec, ~subset(my_data_panel, month == .x))
-
-fit3 = 
-  lm(
-    nh_monthly_fatality_rate
-    ~ election_result,
-    data = fatal_sub[[1]]
-  )
-summary(fit3)
-
-```
-
-
-
-```{r}
-fit4 = 
-  lm(
-    county_prevalence
-    ~ election_result,
-    data = my_data
-  )
-summary(fit4)
 ```
 
 
