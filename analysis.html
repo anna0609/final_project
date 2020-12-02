@@ -22,19 +22,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
-<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
-
-<style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -337,7 +326,9 @@ $(document).ready(function () {
 <pre class="r"><code>library(tidyverse)
 library(corrplot)
 library(&quot;Hmisc&quot;)
-library(&quot;PerformanceAnalytics&quot;)</code></pre>
+library(&quot;PerformanceAnalytics&quot;)
+library(lmtest)
+library(sjPlot)</code></pre>
 <pre class="r"><code>data1 =
 read_csv(&quot;./data/overall_df_2020.11.27.csv&quot;)</code></pre>
 <pre><code>## Parsed with column specification:
@@ -534,6 +525,600 @@ res</code></pre>
 </div>
 </div>
 </div>
+<div id="multiple-linear-regression-with-panel-data" class="section level1">
+<h1>3. Multiple Linear Regression with Panel Data</h1>
+<div id="amlr-model-panel-data-regression-using-backward-elimination-to-select-features" class="section level2">
+<h2>a)MLR model: panel data regression using backward elimination to select features</h2>
+<ol start="0" style="list-style-type: decimal">
+<li>filter NAs in predictors</li>
+<li>Select potential predictors according to correlation matrix and epidemiology concept</li>
+<li>create initial model with longitudinal data</li>
+<li>using backward elimination to do feature selection</li>
+<li>diagnostics with homoskedasticity and residual</li>
+</ol>
+<pre class="r"><code>my_data_lm =
+read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
+  janitor::clean_names() %&gt;% 
+  relocate(election_result) %&gt;% 
+  mutate(
+   election_result = ifelse(election_result==&quot;D&quot;, &quot;1&quot;,&quot;0&quot;)
+   ) %&gt;% 
+  mutate(
+    election_result = as.numeric(election_result),
+    county = as.factor(county),
+    month = as.factor(month)
+  ) %&gt;% 
+  mutate(
+      nh_occupancy_rate = ifelse(nh_occupancy_rate &gt;= 1, NA,nh_occupancy_rate)
+  ) %&gt;% 
+  drop_na() %&gt;% 
+  filter_all(all_vars(is.finite(.)))</code></pre>
+<pre class="r"><code># all potential predictors
+multi_fit =
+  lm(county_monthly_prevalence
+     ~ election_result
+     + nh_occupancy_rate
+     + staff_flu_vaccination_rate
+     + total_shortage_stuff_monthly
+     + ventilator_dependent_unit_monthly
+     + monthly_infection_rate
+     + monthly_fatality_rate,
+     
+     data = my_data
+  )
+summary(multi_fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = county_monthly_prevalence ~ election_result + nh_occupancy_rate + 
+##     staff_flu_vaccination_rate + total_shortage_stuff_monthly + 
+##     ventilator_dependent_unit_monthly + monthly_infection_rate + 
+##     monthly_fatality_rate, data = my_data)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.103403 -0.011311  0.000596  0.010279  0.232158 
+## 
+## Coefficients:
+##                                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                       -6.569e-02  2.489e-02  -2.639  0.00887 ** 
+## election_result                   -3.609e-03  5.605e-03  -0.644  0.52033    
+## nh_occupancy_rate                  3.561e-02  2.476e-02   1.438  0.15169    
+## staff_flu_vaccination_rate         1.759e-02  1.224e-02   1.437  0.15195    
+## total_shortage_stuff_monthly      -6.633e-05  5.293e-03  -0.013  0.99001    
+## ventilator_dependent_unit_monthly -2.151e-02  5.255e-03  -4.093 5.87e-05 ***
+## monthly_infection_rate             3.865e+00  1.894e-01  20.403  &lt; 2e-16 ***
+## monthly_fatality_rate              1.500e-01  5.165e-02   2.905  0.00403 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.03022 on 234 degrees of freedom
+##   (118 observations deleted due to missingness)
+## Multiple R-squared:  0.6597, Adjusted R-squared:  0.6496 
+## F-statistic: 64.82 on 7 and 234 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># backward elimination
+step1 = update(multi_fit, . ~ . -total_shortage_stuff_monthly)
+
+#step2
+step2 = update(step1, .~. -election_result)
+
+#step3
+step3 = update(step2, .~. -nh_occupancy_rate)
+
+# stpe4
+step4 = update(step3, .~. -staff_flu_vaccination_rate)
+
+
+# diagnostic MLR
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+diag_plot1 = plot(step4)</code></pre>
+<p><img src="analysis_files/figure-html/panel%20data%20model%20fiting-1.png" width="672" /></p>
+<pre class="r"><code>diag_plot1</code></pre>
+<pre><code>## NULL</code></pre>
+<pre class="r"><code># test heteroskedasticity
+bptest(step4)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  step4
+## BP = 75.091, df = 3, p-value = 3.464e-16</code></pre>
+<pre class="r"><code># ensemble models summary table
+mlr_tab1 = 
+  tab_model(step4, step3, step2, step1, show.p = TRUE, show.ci = FALSE)
+
+mlr_tab1</code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+county monthly prevalence
+</th>
+<th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+county monthly prevalence
+</th>
+<th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+county monthly prevalence
+</th>
+<th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+county monthly prevalence
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7">
+p
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col8">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col9">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.04
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.001</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.07
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>0.004</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
+-0.07
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
+<strong>0.006</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+ventilator_dependent_unit_monthly
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>&lt;0.001
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
+-0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+monthly_infection_rate
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.83
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.81
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.87
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>&lt;0.001
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
+3.86
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+monthly_fatality_rate
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.13
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.008</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.15
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.004</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.15
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+<strong>0.002</strong>
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
+0.15
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
+<strong>0.004</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+staff_flu_vaccination_rate
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.126
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+0.130
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
+0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
+0.151
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+nh_occupancy_rate
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.04
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+0.132
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
+0.04
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
+0.146
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+election_result
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7">
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8">
+-0.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9">
+0.518
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2">
+252
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2">
+247
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2">
+247
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2">
+242
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+0.661 / 0.657
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+0.664 / 0.659
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+0.667 / 0.661
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+0.660 / 0.651
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id="simple-mlr-without-longitudinal-form" class="section level1">
+<h1>2. Simple MLR without longitudinal form</h1>
+<div id="a-mlr-stepwise-aic-regression" class="section level2">
+<h2>a) MLR stepwise AIC regression</h2>
+<ol style="list-style-type: decimal">
+<li>convert data to non-longitudinal form</li>
+<li>use step AIC regression to perform feature selection</li>
+<li>diagnostics</li>
+</ol>
+<pre class="r"><code># clear entity and states
+no.na.data = 
+  my_data_lm %&gt;% 
+  na.omit() %&gt;% 
+  select(
+    -county,
+    -month
+  )
+
+# step AIC regression
+aic_res &lt;- lm(county_monthly_prevalence ~ ., data=no.na.data)
+step_ml = step(aic_res, direction=&#39;backward&#39;, trace = 0)
+
+summary(step_ml)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = county_monthly_prevalence ~ residents_covid19_deaths_per_month + 
+##     residents_covid19_cases_per_month + county_monthly_occupancy + 
+##     nh_occupancy_rate + ventilator_dependent_unit_monthly + monthly_new_positives + 
+##     monthly_new_tests_performed + monthly_infection_rate + monthly_fatality_rate, 
+##     data = no.na.data)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.079114 -0.015448  0.000492  0.014687  0.187169 
+## 
+## Coefficients:
+##                                      Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                        -1.294e-01  4.293e-02  -3.014 0.003204 ** 
+## residents_covid19_deaths_per_month -3.536e-04  1.974e-04  -1.791 0.076042 .  
+## residents_covid19_cases_per_month   2.843e-04  7.576e-05   3.753 0.000282 ***
+## county_monthly_occupancy           -8.906e-06  4.466e-06  -1.994 0.048617 *  
+## nh_occupancy_rate                   1.136e-01  4.891e-02   2.322 0.022070 *  
+## ventilator_dependent_unit_monthly  -2.396e-02  7.433e-03  -3.224 0.001670 ** 
+## monthly_new_positives              -2.943e-05  6.778e-06  -4.342 3.17e-05 ***
+## monthly_new_tests_performed         5.187e-07  1.792e-07   2.894 0.004593 ** 
+## monthly_infection_rate              4.404e+00  3.085e-01  14.272  &lt; 2e-16 ***
+## monthly_fatality_rate               4.481e-01  1.076e-01   4.163 6.30e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.03259 on 109 degrees of freedom
+## Multiple R-squared:  0.7925, Adjusted R-squared:  0.7754 
+## F-statistic: 46.26 on 9 and 109 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># diagnostics
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+plot(step_ml)</code></pre>
+<p><img src="analysis_files/figure-html/simple%20MLR-1.png" width="672" /></p>
+<pre class="r"><code># test heteroskedasticity
+bptest(step_ml)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  step_ml
+## BP = 44.67, df = 9, p-value = 1.062e-06</code></pre>
+<pre class="r"><code># summary table
+mlr_tab2 = 
+  tab_model(step_ml, show.p = TRUE, show.ci = FALSE)
+
+mlr_tab2</code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+county monthly prevalence
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.13
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.003</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+residents_covid19_deaths_per_month
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.076
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+residents_covid19_cases_per_month
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+county_monthly_occupancy
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.049</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+nh_occupancy_rate
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.11
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.022</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+ventilator_dependent_unit_monthly
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.002</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+monthly_new_positives
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+monthly_new_tests_performed
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.005</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+monthly_infection_rate
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+4.40
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+monthly_fatality_rate
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.45
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2">
+119
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
+0.793 / 0.775
+</td>
+</tr>
+</table>
+</div>
+</div>
 
 
 
@@ -544,7 +1129,7 @@ res</code></pre>
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();

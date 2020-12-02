@@ -12,6 +12,8 @@ library(tidyverse)
 library(corrplot)
 library("Hmisc")
 library("PerformanceAnalytics")
+library(lmtest)
+library(sjPlot)
 ```
 
 ```{r}
@@ -183,3 +185,166 @@ res
 ```
 
 From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 2.2e-16 < 0.05. Therefore, we reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the different for NY State residents and nursing home seniors.
+
+
+## 3. Multiple Linear Regression with Panel Data
+
+The Data is containing information with county and date. To better eliminate bias and capture entity effect and time effect in the model, we first try a panel data regression.
+
+Note here we are exploring the nursing home prevalence rate as dependent variable.
+
+### a)MLR model: panel data regression using backward elimination to select features
+
+0. filter NAs in predictors
+1. Select potential predictors according to correlation matrix and epidemiology concept
+2. create initial model with longitudinal data
+3. using backward elimination to do feature selection
+4. diagnostics with homoskedasticity and residual
+
+```{r mlr models panel data, message=FALSE}
+
+my_data_lm =
+read_csv("./data/final_df.csv") %>%
+  janitor::clean_names() %>% 
+  relocate(election_result) %>% 
+  mutate(
+   election_result = ifelse(election_result=="D", "1","0")
+   ) %>% 
+  mutate(
+    election_result = as.numeric(election_result),
+    county = as.factor(county),
+    month = as.factor(month)
+  ) %>% 
+  mutate(
+      nh_occupancy_rate = ifelse(nh_occupancy_rate >= 1, NA,nh_occupancy_rate)
+  ) %>% 
+  drop_na() %>% 
+  filter_all(all_vars(is.finite(.)))
+```
+
+
+```{r panel data model fiting, message=FALSE}
+
+# all potential predictors
+multi_fit =
+  lm(county_monthly_prevalence
+     ~ election_result
+     + nh_occupancy_rate
+     + staff_flu_vaccination_rate
+     + total_shortage_stuff_monthly
+     + ventilator_dependent_unit_monthly
+     + monthly_infection_rate
+     + monthly_fatality_rate,
+     
+     data = my_data
+  )
+summary(multi_fit)
+
+# backward elimination
+step1 = update(multi_fit, . ~ . -total_shortage_stuff_monthly)
+
+#step2
+step2 = update(step1, .~. -election_result)
+
+#step3
+step3 = update(step2, .~. -nh_occupancy_rate)
+
+# stpe4
+step4 = update(step3, .~. -staff_flu_vaccination_rate)
+
+
+# diagnostic MLR
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+diag_plot1 = plot(step4)
+diag_plot1
+
+# test heteroskedasticity
+bptest(step4)
+
+# ensemble models summary table
+mlr_tab1 = 
+  tab_model(step4, step3, step2, step1, show.p = TRUE, show.ci = FALSE)
+
+mlr_tab1
+
+```
+
+
+The result table shows a model summary for several potential predictors to best predict nursing home monthly prevalence rate. From the best fitted regression model(1), we learned that 
+
+0. out of expectation, we conclude that election result cannot affect nursing home COVID prevalence. This is probably affected by the fact that we are using binary election outcome, if we use a continuous measurement of election and political belief, it might change the regression result.
+
+1. ventilator can decrease nursing home COVID prevalence, although in a small amount. If there is sufficient ventilator in the facility, COVID prevalence wold decrease by 2%
+
+2. the nursing home COVID prevalence is largely dependent on infection rate of its county. Each 0.1% increase in the county infection rate would increase nursing home prevalence by 38.3%
+
+3. each 10% increase in county's fatality rate would increase 130% nursing home prevalence
+
+
+## 4. Simple MLR without longitudinal form
+
+We continue to use simple multiple linear regression to predict the nursing home prevalence. This will give us a more generalized model.
+
+We use AIC regression for the modeling.
+
+
+### a) MLR stepwise AIC regression
+
+1. convert data to non-longitudinal form
+2. use step AIC regression to perform feature selection
+3. diagnostics
+
+```{r simple MLR, message = FALSE}
+
+# clear entity and states
+no.na.data = 
+  my_data_lm %>% 
+  na.omit() %>% 
+  select(
+    -county,
+    -month
+  )
+
+# step AIC regression
+aic_res <- lm(county_monthly_prevalence ~ ., data=no.na.data)
+step_ml = step(aic_res, direction='backward', trace = 0)
+
+summary(step_ml)
+
+aic_res2 = lm(county_monthly_prevalence 
+              ~nh_occupancy_rate
+              + ventilator_dependent_unit_monthly
+              + monthly_infection_rate 
+              + monthly_fatality_rate,
+              
+              data = no.na.data
+                
+                )
+summary(aic_res2)
+
+# diagnostics
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+plot(aic_res2)
+
+# test heteroskedasticity
+bptest(aic_res2)
+
+# summary table
+mlr_tab2 = 
+  tab_model(aic_res2, show.p = TRUE, show.ci = FALSE)
+
+mlr_tab2
+
+```
+
+
+
+From this table, we can confirm the directions of predictors in our previous panel data regression. Ventilator still has negative yet small effect. However, county infection rate and fatality rate has a larger coefficient here. 
+
+Both the models reached a 71% R2, which shows the models can explain 71% of variability in the data.
+
+
+
+
+
+
