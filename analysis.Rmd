@@ -1,7 +1,10 @@
 ---
 title: "Analysis"
-output: html_document
-code_folding: hide
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
 ---
 In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
 
