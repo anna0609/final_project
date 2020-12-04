@@ -10,7 +10,7 @@ In this section we are going to do the following three analysis: Correlation Mat
 
 ## 1. Correlation Matrix
 
-```{r, message=FALSE}
+```{r, include=FALSE}
 library(tidyverse)
 library(corrplot)
 library("Hmisc")
@@ -21,7 +21,7 @@ library("ggplot2")
 library("GGally") 
 ```
 
-```{r, message=FALSE}
+```{r, include=FALSE}
 data1 =
 read_csv("./data/overall_df_2020.11.27.csv")
 data2 =
@@ -124,11 +124,17 @@ We are going to Compare the NY State residents and nursing home seniors’ media
 
 #### test normality
 
-```{r, message=FALSE}
+```{r, include=FALSE}
 library(rvest)
 library(lattice)
 library(faraway)
 library(broom)
+library(tidyverse)
+library(dplyr)
+library(HH)
+library(leaps)
+library(corrplot)    
+library(caret)
 ```
 
 ```{r, message=FALSE}
@@ -375,13 +381,9 @@ mlr_tab2
 
 ```
 
-
-
 From this table, we can confirm the directions of predictors in our previous panel data regression. Ventilator still has negative yet small effect. However, county infection rate and fatality rate has a larger coefficient here. 
 
 Both the models reached a 71% R2, which shows the models can explain 71% of variability in the data.
-
-
 
 
 

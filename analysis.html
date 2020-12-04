@@ -422,21 +422,6 @@ div.tocify {
 <p>In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.</p>
 <div id="correlation-matrix" class="section level2">
 <h2>1. Correlation Matrix</h2>
-<pre class="r"><code>library(tidyverse)
-library(corrplot)
-library(&quot;Hmisc&quot;)
-library(&quot;PerformanceAnalytics&quot;)
-library(lmtest)
-library(sjPlot)
-library(&quot;ggplot2&quot;)                  
-library(&quot;GGally&quot;) </code></pre>
-<pre class="r"><code>data1 =
-read_csv(&quot;./data/overall_df_2020.11.27.csv&quot;)
-data2 =
-read_csv(&quot;./data/county_poll.csv&quot;)
-final_df =
-left_join(data1, data2, by = &quot;county&quot;)
-write_csv(final_df, path = &quot;./data/final_df.csv&quot;)</code></pre>
 <p>Paired plot for correlation variables</p>
 <pre class="r"><code>options(warn = -1)
 my_data =
@@ -506,10 +491,6 @@ geom_text(aes(x=row, y=column, label=cor), color = &quot;black&quot;, size = 2)<
 <h3>a) Compare the NY State residents and nursing home seniors’ medians level of fatality rate.</h3>
 <div id="test-normality" class="section level4">
 <h4>test normality</h4>
-<pre class="r"><code>library(rvest)
-library(lattice)
-library(faraway)
-library(broom)</code></pre>
 <pre class="r"><code>nursing_house_df =
 read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;% 

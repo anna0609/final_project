@@ -32,13 +32,15 @@ COVID-19 Nursing Home Seniors’ Mortality Distribution in Republic and Democrat
 
 Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km3624), Yutian Luo(yl4608)
 
+
+<br/>
+![](./pictures/cover.jpg)
+
 ### Website Navigation:
 
-* <b>[About](about.html)</b>:A brief introduction of our project in cluding our motivation, data sources, and report.
+* <b>[About](about.html)</b>: A brief introduction of our project including our motivation, data sources, and report.
 * <b>[Overview](overview.html)</b>: Multiple trend comparisons between nursing homes(county as unit) and the whole country.
-* <b>[Mapping](mapping.html)</b>:
+* <b>[Mapping](mapping.html)</b>: COVID-19 Map For New York State in May 2020
 * <b>[Analysis](analysis.html)</b>: Statistical analysis for our project, including Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
 * <b>[Fun Explorations](more.html)</b>: Discuss other factors, such as political influence and nursing home facility, and how they may relate to the situations in NY nursing homes.
 * <b>[Nursing Home Trends](dashboard.html)</b>: Multiple trend comparisons of nursing homes between different counties.
-<br/>
-![](./pictures/cover.jpg)
