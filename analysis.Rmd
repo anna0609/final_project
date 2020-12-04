@@ -253,13 +253,13 @@ step3 = update(step2, .~. -nh_occupancy_rate)
 step4 = update(step3, .~. -staff_flu_vaccination_rate)
 
 
-# diagnostic MLR
-layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
-diag_plot1 = plot(step4)
-diag_plot1
+# # diagnostic MLR
+# layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+# diag_plot1 = plot(step4)
+# diag_plot1
 
-# test heteroskedasticity
-bptest(step4)
+# # test heteroskedasticity
+# bptest(step4)
 
 # ensemble models summary table
 mlr_tab1 = 
@@ -281,7 +281,7 @@ The result table shows a model summary for several potential predictors to best 
 3. each 10% increase in county's fatality rate would increase 130% nursing home prevalence
 
 
-## 4. Simple MLR without longitudinal form
+## 4. MLR Without panel data form
 
 We continue to use simple multiple linear regression to predict the nursing home prevalence. This will give us a more generalized model.
 
@@ -322,12 +322,12 @@ aic_res2 = lm(county_monthly_prevalence
                 )
 summary(aic_res2)
 
-# diagnostics
-layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
-plot(aic_res2)
+# # diagnostics
+# layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+# plot(aic_res2)
 
-# test heteroskedasticity
-bptest(aic_res2)
+# # test heteroskedasticity
+# bptest(aic_res2)
 
 # summary table
 mlr_tab2 = 
