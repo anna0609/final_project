@@ -1,11 +1,12 @@
 ---
 title: "overview"
-output:
-  html_document
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
 ---
 
-<<<<<<< HEAD
-=======
 ```{r}
 library(tidyverse)
 library(p8105.datasets)
@@ -82,7 +83,4 @@ ggplot() +
 
 compare_fatality_rate
 ```
-
-
->>>>>>> 77f8f1b4a65277580776573f3fdfd299dabfe692
 

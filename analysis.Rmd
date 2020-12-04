@@ -1,22 +1,27 @@
 ---
 title: "Analysis"
-output: html_document
-code_folding: hide
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
 ---
 In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
 
 ## 1. Correlation Matrix
 
-```{r, message=FALSE}
+```{r, include=FALSE}
 library(tidyverse)
 library(corrplot)
 library("Hmisc")
 library("PerformanceAnalytics")
 library(lmtest)
 library(sjPlot)
+library("ggplot2")                  
+library("GGally") 
 ```
 
-```{r}
+```{r, include=FALSE}
 data1 =
 read_csv("./data/overall_df_2020.11.27.csv")
 data2 =
@@ -26,7 +31,9 @@ left_join(data1, data2, by = "county")
 write_csv(final_df, path = "./data/final_df.csv")
 ```
 
-```{r, message=FALSE}
+Paired plot for correlation variables
+```{r, message = FALSE}
+options(warn = -1)
 my_data =
 read_csv("./data/final_df.csv") %>%
   janitor::clean_names() %>% 
@@ -37,13 +44,44 @@ read_csv("./data/final_df.csv") %>%
   mutate(election_result = as.numeric(election_result)) %>% 
   select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
 
-res = cor(my_data, use = "complete.obs") #handle missing value
+res = round(cor(my_data, use = "complete.obs"),3) #handle missing value
+```
+
+
+```{r, include = FALSE}
+pair_plot_df =
+  my_data %>% 
+  rename(residents_covid19_cases = residents_covid19_cases_per_month) %>% 
+  rename(residents_covid19_deaths = residents_covid19_deaths_per_month) %>% 
+  rename(ventilator_dependent_unit = ventilator_dependent_unit_monthly) %>% 
+  rename(total_shortage_stuff = total_shortage_stuff_monthly) %>% 
+  rename(new_tests_performed = monthly_new_tests_performed) %>% 
+  rename(new_positives = monthly_new_positives) %>% 
+  rename(infection_rate = monthly_infection_rate) %>% 
+  rename(fatality_rate = monthly_fatality_rate) %>% 
+  rename(county_occupancy = county_monthly_occupancy) %>% 
+  rename(county_prevalence = county_monthly_prevalence) %>% 
+  rename(county_cases = county_monthly_cases)
+```
+
+
+```{r, message = FALSE}
+ggpairs(pair_plot_df, 1:4)
+ggpairs(pair_plot_df, 5:9)+  
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+    size = 9, hjust = 1))
+ggpairs(pair_plot_df, 10:14)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+    size = 9, hjust = 1))
 
 res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
   
 # Extract the correlation coefficients：res2$r
 # Extract p-values：res2$P
+```
 
+heat map for correlation matrix
+```{r, message = FALSE}
 # format the correlation matrix
 flattenCorrMatrix <- function(cormat, pmat) {
   ut <- upper.tri(cormat)
@@ -63,8 +101,8 @@ tidy_df =
 #display a chart of a correlation matrix
 #chart.Correlation(my_data, histogram=TRUE, pch=19)
 # heat map
-col<- colorRampPalette(c("blue", "white", "red"))(20)
-heatmap(x = res, col = col, symm = TRUE)
+#col<- colorRampPalette(c("blue", "white", "red"))(20)
+#heatmap(x = res, col = col, symm = TRUE)
 
 ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
  geom_tile(color = "white")+
@@ -86,11 +124,17 @@ We are going to Compare the NY State residents and nursing home seniors’ media
 
 #### test normality
 
-```{r, message=FALSE}
+```{r, include=FALSE}
 library(rvest)
 library(lattice)
 library(faraway)
 library(broom)
+library(tidyverse)
+library(dplyr)
+library(HH)
+library(leaps)
+library(corrplot)    
+library(caret)
 ```
 
 ```{r, message=FALSE}
@@ -337,13 +381,9 @@ mlr_tab2
 
 ```
 
-
-
 From this table, we can confirm the directions of predictors in our previous panel data regression. Ventilator still has negative yet small effect. However, county infection rate and fatality rate has a larger coefficient here. 
 
 Both the models reached a 71% R2, which shows the models can explain 71% of variability in the data.
-
-
 
 
 

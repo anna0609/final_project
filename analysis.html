@@ -19,11 +19,26 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -247,7 +262,73 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -257,6 +338,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -313,6 +404,14 @@ $(document).ready(function () {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Analysis</h1>
@@ -323,45 +422,9 @@ $(document).ready(function () {
 <p>In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.</p>
 <div id="correlation-matrix" class="section level2">
 <h2>1. Correlation Matrix</h2>
-<pre class="r"><code>library(tidyverse)
-library(corrplot)
-library(&quot;Hmisc&quot;)
-library(&quot;PerformanceAnalytics&quot;)
-library(lmtest)
-library(sjPlot)</code></pre>
-<pre class="r"><code>data1 =
-read_csv(&quot;./data/overall_df_2020.11.27.csv&quot;)</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   month = col_double(),
-##   county = col_character(),
-##   residents_covid19_deaths_per_month = col_double(),
-##   residents_covid19_cases_per_month = col_double(),
-##   NH_monthly_fatality_rate = col_double(),
-##   county_monthly_occupancy = col_double(),
-##   county_monthly_cases = col_double(),
-##   county_monthly_prevalence = col_double(),
-##   NH_occupancy_rate = col_double(),
-##   staff_flu_vaccination_rate = col_double(),
-##   total_supply_ppe_monthly = col_double(),
-##   total_shortage_stuff_monthly = col_double(),
-##   ventilator_dependent_unit_monthly = col_double(),
-##   monthly_new_positives = col_double(),
-##   monthly_new_tests_performed = col_double(),
-##   monthly_infection_rate = col_double(),
-##   monthly_fatality_rate = col_double()
-## )</code></pre>
-<pre class="r"><code>data2 =
-read_csv(&quot;./data/county_poll.csv&quot;)</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   county = col_character(),
-##   election_result = col_character()
-## )</code></pre>
-<pre class="r"><code>final_df =
-left_join(data1, data2, by = &quot;county&quot;)
-write_csv(final_df, path = &quot;./data/final_df.csv&quot;)</code></pre>
-<pre class="r"><code>my_data =
+<p>Paired plot for correlation variables</p>
+<pre class="r"><code>options(warn = -1)
+my_data =
 read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;% 
   relocate(election_result) %&gt;% 
@@ -371,14 +434,23 @@ read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
   mutate(election_result = as.numeric(election_result)) %&gt;% 
   select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
 
-res = cor(my_data, use = &quot;complete.obs&quot;) #handle missing value
-
-res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
+res = round(cor(my_data, use = &quot;complete.obs&quot;),3) #handle missing value</code></pre>
+<pre class="r"><code>ggpairs(pair_plot_df, 1:4)</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>ggpairs(pair_plot_df, 5:9)+  
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+    size = 9, hjust = 1))</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre class="r"><code>ggpairs(pair_plot_df, 10:14)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+    size = 9, hjust = 1))</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<pre class="r"><code>res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
   
 # Extract the correlation coefficients：res2$r
-# Extract p-values：res2$P
-
-# format the correlation matrix
+# Extract p-values：res2$P</code></pre>
+<p>heat map for correlation matrix</p>
+<pre class="r"><code># format the correlation matrix
 flattenCorrMatrix &lt;- function(cormat, pmat) {
   ut &lt;- upper.tri(cormat)
   data.frame(
@@ -397,10 +469,10 @@ tidy_df =
 #display a chart of a correlation matrix
 #chart.Correlation(my_data, histogram=TRUE, pch=19)
 # heat map
-col&lt;- colorRampPalette(c(&quot;blue&quot;, &quot;white&quot;, &quot;red&quot;))(20)
-heatmap(x = res, col = col, symm = TRUE)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<pre class="r"><code>ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
+#col&lt;- colorRampPalette(c(&quot;blue&quot;, &quot;white&quot;, &quot;red&quot;))(20)
+#heatmap(x = res, col = col, symm = TRUE)
+
+ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
  geom_tile(color = &quot;white&quot;)+
  scale_fill_gradient2(low = &quot;blue&quot;, high = &quot;red&quot;, mid = &quot;white&quot;, 
    midpoint = 0, limit = c(-1,1), space = &quot;Lab&quot;, 
@@ -410,7 +482,7 @@ heatmap(x = res, col = col, symm = TRUE)</code></pre>
     size = 9, hjust = 1))+
  coord_fixed() + 
 geom_text(aes(x=row, y=column, label=cor), color = &quot;black&quot;, size = 2)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 <div id="wilcoxon-rank-sum-test" class="section level2">
 <h2>2. Wilcoxon Rank-sum Test</h2>
@@ -419,10 +491,6 @@ geom_text(aes(x=row, y=column, label=cor), color = &quot;black&quot;, size = 2)<
 <h3>a) Compare the NY State residents and nursing home seniors’ medians level of fatality rate.</h3>
 <div id="test-normality" class="section level4">
 <h4>test normality</h4>
-<pre class="r"><code>library(rvest)
-library(lattice)
-library(faraway)
-library(broom)</code></pre>
 <pre class="r"><code>nursing_house_df =
 read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;% 
@@ -445,7 +513,7 @@ qqline(nursing_house_df$nh_monthly_fatality_rate, col = 1,lwd=2,lty=2)
 
 qqnorm(residents_df$monthly_fatality_rate, col=2, pch=19, cex=1.5)
 qqline(residents_df$monthly_fatality_rate, col = 1,lwd=2,lty=2)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <p>From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly fatality rate and residents monthly fatality rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:</p>
 <p>H0: The medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.</p>
 <p>Ha: The medians level of monthly fatality rate are different for NY State residents and nursing home seniors.</p>
@@ -498,7 +566,7 @@ qqline(nursing_house_df2$nh_monthly_infection_rate, col = 1,lwd=2,lty=2)
 
 qqnorm(residents_df2$monthly_infection_rate, col=2, pch=19, cex=1.5)
 qqline(residents_df2$monthly_infection_rate, col = 1,lwd=2,lty=2)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly infection rate and residents monthly infection rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:</p>
 <p>H0: The medians level of monthly infection rate are the same for NY State residents and nursing home seniors.</p>
 <p>Ha: The medians level of monthly infection rate are different for NY State residents and nursing home seniors.</p>
@@ -525,10 +593,12 @@ res</code></pre>
 </div>
 </div>
 </div>
-<div id="multiple-linear-regression-with-panel-data" class="section level1">
-<h1>3. Multiple Linear Regression with Panel Data</h1>
-<div id="amlr-model-panel-data-regression-using-backward-elimination-to-select-features" class="section level2">
-<h2>a)MLR model: panel data regression using backward elimination to select features</h2>
+<div id="multiple-linear-regression-with-panel-data" class="section level2">
+<h2>3. Multiple Linear Regression with Panel Data</h2>
+<p>The Data is containing information with county and date. To better eliminate bias and capture entity effect and time effect in the model, we first try a panel data regression.</p>
+<p>Note here we are exploring the nursing home prevalence rate as dependent variable.</p>
+<div id="amlr-model-panel-data-regression-using-backward-elimination-to-select-features" class="section level3">
+<h3>a)MLR model: panel data regression using backward elimination to select features</h3>
 <ol start="0" style="list-style-type: decimal">
 <li>filter NAs in predictors</li>
 <li>Select potential predictors according to correlation matrix and epidemiology concept</li>
@@ -899,12 +969,21 @@ R<sup>2</sup> / R<sup>2</sup> adjusted
 </td>
 </tr>
 </table>
+<p>The result table shows a model summary for several potential predictors to best predict nursing home monthly prevalence rate. From the best fitted regression model(1), we learned that</p>
+<ol start="0" style="list-style-type: decimal">
+<li><p>out of expectation, we conclude that election result cannot affect nursing home COVID prevalence. This is probably affected by the fact that we are using binary election outcome, if we use a continuous measurement of election and political belief, it might change the regression result.</p></li>
+<li><p>ventilator can decrease nursing home COVID prevalence, although in a small amount. If there is sufficient ventilator in the facility, COVID prevalence wold decrease by 2%</p></li>
+<li><p>the nursing home COVID prevalence is largely dependent on infection rate of its county. Each 0.1% increase in the county infection rate would increase nursing home prevalence by 38.3%</p></li>
+<li><p>each 10% increase in county’s fatality rate would increase 130% nursing home prevalence</p></li>
+</ol>
 </div>
 </div>
-<div id="simple-mlr-without-longitudinal-form" class="section level1">
-<h1>2. Simple MLR without longitudinal form</h1>
-<div id="a-mlr-stepwise-aic-regression" class="section level2">
-<h2>a) MLR stepwise AIC regression</h2>
+<div id="simple-mlr-without-longitudinal-form" class="section level2">
+<h2>4. Simple MLR without longitudinal form</h2>
+<p>We continue to use simple multiple linear regression to predict the nursing home prevalence. This will give us a more generalized model.</p>
+<p>We use AIC regression for the modeling.</p>
+<div id="a-mlr-stepwise-aic-regression" class="section level3">
+<h3>a) MLR stepwise AIC regression</h3>
 <ol style="list-style-type: decimal">
 <li>convert data to non-longitudinal form</li>
 <li>use step AIC regression to perform feature selection</li>
@@ -954,20 +1033,53 @@ summary(step_ml)</code></pre>
 ## Residual standard error: 0.03259 on 109 degrees of freedom
 ## Multiple R-squared:  0.7925, Adjusted R-squared:  0.7754 
 ## F-statistic: 46.26 on 9 and 109 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>aic_res2 = lm(county_monthly_prevalence 
+              ~nh_occupancy_rate
+              + ventilator_dependent_unit_monthly
+              + monthly_infection_rate 
+              + monthly_fatality_rate,
+              
+              data = no.na.data
+                
+                )
+summary(aic_res2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = county_monthly_prevalence ~ nh_occupancy_rate + 
+##     ventilator_dependent_unit_monthly + monthly_infection_rate + 
+##     monthly_fatality_rate, data = no.na.data)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.123707 -0.017737 -0.004597  0.018464  0.217233 
+## 
+## Coefficients:
+##                                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                       -0.108363   0.048011  -2.257  0.02591 *  
+## nh_occupancy_rate                  0.101188   0.054700   1.850  0.06692 .  
+## ventilator_dependent_unit_monthly -0.034635   0.007155  -4.841  4.1e-06 ***
+## monthly_infection_rate             4.083883   0.262607  15.551  &lt; 2e-16 ***
+## monthly_fatality_rate              0.327283   0.115930   2.823  0.00561 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.03791 on 114 degrees of freedom
+## Multiple R-squared:  0.7063, Adjusted R-squared:  0.6959 
+## F-statistic: 68.52 on 4 and 114 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># diagnostics
 layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
-plot(step_ml)</code></pre>
+plot(aic_res2)</code></pre>
 <p><img src="analysis_files/figure-html/simple%20MLR-1.png" width="672" /></p>
 <pre class="r"><code># test heteroskedasticity
-bptest(step_ml)</code></pre>
+bptest(aic_res2)</code></pre>
 <pre><code>## 
 ##  studentized Breusch-Pagan test
 ## 
-## data:  step_ml
-## BP = 44.67, df = 9, p-value = 1.062e-06</code></pre>
+## data:  aic_res2
+## BP = 37.203, df = 4, p-value = 1.636e-07</code></pre>
 <pre class="r"><code># summary table
 mlr_tab2 = 
-  tab_model(step_ml, show.p = TRUE, show.ci = FALSE)
+  tab_model(aic_res2, show.p = TRUE, show.ci = FALSE)
 
 mlr_tab2</code></pre>
 <table style="border-collapse:collapse; border:none;">
@@ -995,43 +1107,10 @@ p
 (Intercept)
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
--0.13
+-0.11
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>0.003</strong>
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-residents_covid19_deaths_per_month
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
--0.00
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.076
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-residents_covid19_cases_per_month
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.00
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>&lt;0.001
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-county_monthly_occupancy
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
--0.00
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>0.049</strong>
+<strong>0.026</strong>
 </td>
 </tr>
 <tr>
@@ -1039,10 +1118,10 @@ county_monthly_occupancy
 nh_occupancy_rate
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.11
+0.10
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>0.022</strong>
+0.067
 </td>
 </tr>
 <tr>
@@ -1050,18 +1129,7 @@ nh_occupancy_rate
 ventilator_dependent_unit_monthly
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
--0.02
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>0.002</strong>
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-monthly_new_positives
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
--0.00
+-0.03
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 <strong>&lt;0.001
@@ -1069,21 +1137,10 @@ monthly_new_positives
 </tr>
 <tr>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
-monthly_new_tests_performed
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.00
-</td>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>0.005</strong>
-</td>
-</tr>
-<tr>
-<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
 monthly_infection_rate
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-4.40
+4.08
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
 <strong>&lt;0.001
@@ -1094,10 +1151,10 @@ monthly_infection_rate
 monthly_fatality_rate
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-0.45
+0.33
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
-<strong>&lt;0.001
+<strong>0.006</strong>
 </td>
 </tr>
 <tr>
@@ -1113,15 +1170,19 @@ Observations
 R<sup>2</sup> / R<sup>2</sup> adjusted
 </td>
 <td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2">
-0.793 / 0.775
+0.706 / 0.696
 </td>
 </tr>
 </table>
+<p>From this table, we can confirm the directions of predictors in our previous panel data regression. Ventilator still has negative yet small effect. However, county infection rate and fatality rate has a larger coefficient here.</p>
+<p>Both the models reached a 71% R2, which shows the models can explain 71% of variability in the data.</p>
 </div>
 </div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -1129,7 +1190,7 @@ R<sup>2</sup> / R<sup>2</sup> adjusted
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
@@ -1153,7 +1214,38 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

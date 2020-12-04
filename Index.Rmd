@@ -1,10 +1,8 @@
 ---
-title: "NY State Nursing Homes in Covid-19 pandemic"
+title: "NY State Nursing Home Covid-19 Project"
 output: 
   html_document
 ---
-
-
 ```{r include = FALSE}
 library(tidyverse)
 library(readxl)
@@ -26,16 +24,23 @@ testing_df = read_csv("./data/New_York_State_Statewide_COVID-19_Testing.csv") %>
   janitor::clean_names()
 ```
 
-### Comparing nursing homes' situations of each county to that of the whole country
+### Project Topic:
 
-#### Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km3624), Yutian Luo(yl4608)
+COVID-19 Nursing Home Seniors’ Mortality Distribution in Republic and Democratic counties in New York State.
+
+### Group members:
+
+Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km3624), Yutian Luo(yl4608)
 
 
+<br/>
 ![](./pictures/cover.jpg)
 
+### Website Navigation:
 
-### Website Navigation
-* <b>Overview</b>: Multiple trend comparisons between nursing homes(county as unit) and the whole country
-* <b>Nursing Home Trends</b>: Multiple trend comparisons of nursing homes between different counties
-* <b>Analysis</b>: Includes non-parametric tests / linear regression analysis
-* <b>Fun Explorations</b>: Discuss other factors, such as political influence and nursing home facility, and how they may relate to the situations in NY nursing homes
+* <b>[About](about.html)</b>: A brief introduction of our project including our motivation, data sources, and report.
+* <b>[Overview](overview.html)</b>: Multiple trend comparisons between nursing homes(county as unit) and the whole country.
+* <b>[Mapping](mapping.html)</b>: COVID-19 Map For New York State in May 2020
+* <b>[Analysis](analysis.html)</b>: Statistical analysis for our project, including Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
+* <b>[Fun Explorations](more.html)</b>: Discuss other factors, such as political influence and nursing home facility, and how they may relate to the situations in NY nursing homes.
+* <b>[Nursing Home Trends](dashboard.html)</b>: Multiple trend comparisons of nursing homes between different counties.
