@@ -1,5 +1,5 @@
 ---
-title: "overview"
+title: "Overview"
 output: 
   html_document:
     code_folding: hide
@@ -11,7 +11,6 @@ output:
 library(tidyverse)
 library(ggplot2)
 library(plotly)
-library(gganimate)
 ```
 
 
@@ -22,6 +21,7 @@ overall_df =
   janitor::clean_names()
 ```
 
+### An Overview of the trend of infection rates from nursing home and their located counties
 
 ```{r warning=FALSE, message=FALSE}
 # explore the trend of infection rate
@@ -40,11 +40,12 @@ ggplot() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
 
-
 ggplotly(compare_infection_rate)%>% 
     layout(legend = list(orientation = "h",   # show entries horizontally
                      x = 0.3, y = -0.2))  
 ```
+
+### An Overview of the trend of case fatality rates from nursing home and their located counties
 
 ```{r warning=FALSE, message=FALSE}
 # explore the trend of case fatality rate
@@ -63,8 +64,14 @@ ggplot() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
 
-compare_fatality_rate
+ggplotly(compare_fatality_rate) %>% 
+    layout(legend = list(orientation = "h",   # show entries horizontally
+                     x = 0.3, y = -0.2))  
 ```
+
+### Trend of Infection Rate by Month
+
+#### Here we could see that the infection rate of Covid-19 of nursing home level is significantly higher than county level especially in May and June, when the nationwide Covid-19 infection rate is apparently at its peak. In July and August, it seems this unevenness has been relieved. Into September, the infection rate of nursing home level is even lower than county level.
 
 ```{r warning=FALSE, message=FALSE}
 infection_rate =
@@ -72,7 +79,7 @@ infection_rate =
   select(month, county, county_monthly_prevalence, monthly_infection_rate) %>% 
   drop_na() %>% 
   group_by(month) %>% 
-  summarize(
+  summarise(
     'Nursing home level' = mean(county_monthly_prevalence),
     'County level' = mean(monthly_infection_rate)) %>% 
   pivot_longer(
@@ -98,13 +105,17 @@ ggplotly(compare_infection_rate)%>%
                      x = 0.3, y = -0.2))
 ```
 
+### Trend of Average Infection Rates by County
+
+#### By averaging the infection rates by month, here we could see the overall trend by county to compare the infection rate of Covid-19 of nursing home level and county level. Over half of the counties see the higher infection rate in their nursing home sites. 
+
 ```{r warning=FALSE, message=FALSE}
 infection_rate_2 =
   overall_df %>% 
   select(month, county, county_monthly_prevalence, monthly_infection_rate) %>% 
   drop_na() %>% 
   group_by(county) %>% 
-  summarize(
+  summarise(
     'Nursing home level' = mean(county_monthly_prevalence),
     'County level' = mean(monthly_infection_rate)) %>%  
   arrange("Nursing home level") %>%
@@ -131,6 +142,10 @@ ggplotly(compare_infection_rate_2)%>%
 
 ```
 
+### Trend of Case Fatality Rate by Month
+
+#### There is a consistently trend of case fatality rate between nursing home level and county level, with significantly higher case fatality rate in nursing homes than their located counties through May into September. 
+
 ```{r warning=FALSE, message=FALSE}
 case_fatality_rate =
   overall_df %>% 
@@ -138,7 +153,7 @@ case_fatality_rate =
   drop_na() %>% 
   filter(is.finite(nh_monthly_fatality_rate)) %>%
   group_by(month) %>% 
-  summarize(
+  summarise(
     'Nursing home level' = mean(nh_monthly_fatality_rate),
     'County level' = mean(monthly_fatality_rate)) %>% 
   pivot_longer(
@@ -149,7 +164,7 @@ case_fatality_rate =
 
 compare_fatality_rate =
   case_fatality_rate %>% 
-  ggplot(aes(x = as.factor(month),y = case_fatality_rate, fill = level)) +
+  ggplot(aes(x = as.factor(month), y = case_fatality_rate, fill = level)) +
   geom_bar(position = "dodge", stat = "identity") +
   labs(title ="Trend of Case Fatality Rate by Month", 
        x = 'Month',
@@ -164,6 +179,10 @@ ggplotly(compare_fatality_rate)%>%
                      x = 0.3, y = -0.2))
 ```
 
+### Trend of Average Case Fatality Rates by County
+
+#### 
+
 ```{r warning=FALSE, message=FALSE}
 case_fatality_rate_2 =
   overall_df %>% 
@@ -171,7 +190,7 @@ case_fatality_rate_2 =
   drop_na() %>% 
   filter(is.finite(nh_monthly_fatality_rate)) %>%
   group_by(county) %>% 
-  summarize(
+  summarise(
     'Nursing home level' = mean(nh_monthly_fatality_rate),
     'County level' = mean(monthly_fatality_rate)) %>% 
   pivot_longer(
@@ -219,30 +238,3 @@ ggplot() +
 ggplotly(monthly_new_cases)
 ```
 
-```{r warning=FALSE, message=FALSE}
-infection_rate_2b =
-  overall_df %>% 
-  select(month, county, county_monthly_prevalence, monthly_infection_rate) %>% 
-  drop_na() %>% 
-  group_by(county) %>% 
-  summarize(
-    'Nursing home level' = mean(county_monthly_prevalence),
-    'County level' = mean(monthly_infection_rate)) %>% 
-  arrange("Nursing home level")
-
-compare_infection_rate_2b =
-  infection_rate_2b %>% 
-  ggplot() +
-  geom_segment(aes(x = county, xend = county, y='County level', yend = 'Nursing home level'), color = "grey") +
-  geom_point(aes(x = county, y = 'County level'), color = "blue", size = 3) +
-  geom_point(aes(x = county, y = 'Nursing home level'), color = "red", size = 3) +
-  coord_flip() +
-  labs(title ="Trend of Average Infection Rates between May and October by County", 
-       x = 'County',
-       y = 'Infection Rate'
-  ) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  theme(legend.position = "bottom") 
-
-compare_infection_rate_2b
-```
