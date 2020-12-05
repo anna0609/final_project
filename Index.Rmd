@@ -14,7 +14,7 @@ county_poll = read_excel("./data/nycounty_results.xlsx") %>%
   mutate(
     results = ifelse(biden_pct > 0.5, "D", "R") #D stands for Democratic party win and R stands for Republican Party win
   ) %>%
-  select(county, results)
+  dplyr::select(county, results)
 
 county_poll
 ```
