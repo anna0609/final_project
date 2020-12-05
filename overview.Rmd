@@ -22,6 +22,9 @@ overall_df =
 ```
 
 ### An Overview of the trend of infection rates from nursing home and their located counties
+(Blue Dots: Nursing home data points; Black Dots: County data points.)
+
+#### This is to show all data points from May to September of montly infections rates from both nursing homes and their located counties. With most black dots under 10% prevalence of covid-19 each month, there is a great amount of blue dots higher than 10%, indicating the higher infection rates of nursing home than their counties.
 
 ```{r warning=FALSE, message=FALSE}
 # explore the trend of infection rate
@@ -37,6 +40,10 @@ compare_infection_rate =
 ggplot() +
   geom_point(data = NH_infection_rate, aes(x = county, y = county_monthly_prevalence), color = "blue") +
   geom_point(data = County_infection_rate, aes(x = county, y = monthly_infection_rate), color = "black") +
+  labs(title ="Overview of infection rates", 
+       x = 'County',
+       y = 'Monthly Prevalence'
+  ) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
 
@@ -46,6 +53,9 @@ ggplotly(compare_infection_rate)%>%
 ```
 
 ### An Overview of the trend of case fatality rates from nursing home and their located counties
+(Blue Dots: Nursing home data points; Black Dots: County data points.)
+
+#### This is to show all data points from May to September of montly case fatality rates from both nursing homes and their located counties. With most black dots close to 0% case fatality rate, there is an uneven amount of blue dots higher than 50%, indicating the higher case fatality rates of nursing home than their counties.
 
 ```{r warning=FALSE, message=FALSE}
 # explore the trend of case fatality rate
@@ -61,6 +71,10 @@ compare_fatality_rate =
 ggplot() +
   geom_point(data = NH_case_fatality_rate, aes(x = county, y = nh_monthly_fatality_rate), color = "blue") +
   geom_point(data = County_case_fatality_rate, aes(x = county, y = monthly_fatality_rate), color = "black") +
+  labs(title ="Overview of case fatality rates", 
+       x = 'County',
+       y = 'Monthly Fatality Rate'
+  ) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
 
@@ -71,7 +85,7 @@ ggplotly(compare_fatality_rate) %>%
 
 ### Trend of Infection Rate by Month
 
-#### Here we could see that the infection rate of Covid-19 of nursing home level is significantly higher than county level especially in May and June, when the nationwide Covid-19 infection rate is apparently at its peak. In July and August, it seems this unevenness has been relieved. Into September, the infection rate of nursing home level is even lower than county level.
+##### Here we could see that the infection rate of Covid-19 of nursing home level is significantly higher than county level especially in May and June, when the nationwide Covid-19 infection rate is apparently at its peak. In July and August, it seems this unevenness has been relieved. Into September, the infection rate of nursing home level is even lower than county level.
 
 ```{r warning=FALSE, message=FALSE}
 infection_rate =
@@ -107,7 +121,7 @@ ggplotly(compare_infection_rate)%>%
 
 ### Trend of Average Infection Rates by County
 
-#### By averaging the infection rates by month, here we could see the overall trend by county to compare the infection rate of Covid-19 of nursing home level and county level. Over half of the counties see the higher infection rate in their nursing home sites. 
+##### By averaging the infection rates by month from May to September, we could see the overall trend by county of nursing home and their located counties side by side. Over half of the counties see higher infection rates in their nursing home sites. 
 
 ```{r warning=FALSE, message=FALSE}
 infection_rate_2 =
@@ -144,7 +158,7 @@ ggplotly(compare_infection_rate_2)%>%
 
 ### Trend of Case Fatality Rate by Month
 
-#### There is a consistently trend of case fatality rate between nursing home level and county level, with significantly higher case fatality rate in nursing homes than their located counties through May into September. 
+##### There is a consistently trend of case fatality rate between nursing home level and county level, with significantly higher rate in nursing homes than their located counties through May into September. 
 
 ```{r warning=FALSE, message=FALSE}
 case_fatality_rate =
@@ -181,7 +195,7 @@ ggplotly(compare_fatality_rate)%>%
 
 ### Trend of Average Case Fatality Rates by County
 
-#### 
+##### By averaging the case fatality rates by month, here we could see the overall trend by county to compare the case fatality rate of Covid-19 of nursing home level and county level. Almost 90% of the counties see significantly higher case fatality rates in their nursing home sites. 
 
 ```{r warning=FALSE, message=FALSE}
 case_fatality_rate_2 =
@@ -216,25 +230,4 @@ ggplotly(compare_fatality_rate_2)%>%
                      x = 0.3, y = -0.2))
 ```
 
-# Trends of new cases per month of nursing homes against counties
-
-```{r warning=FALSE, message=FALSE}
-# explore the trend of new cases per month
-NH_newcase_permonth =
-  overall_df %>% 
-  select(month, county, residents_covid19_cases_per_month)
-
-County_newcase_permonth = 
-  overall_df %>% 
-  select(month, county, monthly_new_positives)
-
-monthly_new_cases =
-ggplot() +
-  geom_point(data = NH_newcase_permonth, aes(x = month, y = residents_covid19_cases_per_month), color = "blue") +
-  geom_point(data = County_newcase_permonth, aes(x = month, y = monthly_new_positives), color = "black") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  theme(legend.position = "right") 
-
-ggplotly(monthly_new_cases)
-```
 
