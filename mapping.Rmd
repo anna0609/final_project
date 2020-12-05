@@ -66,5 +66,6 @@ ggplotly(
 )
 ```
 
+## Description
 
-For the monthly Covid-19 infection rate in New York, we have observed a peak in May. Then the rate went down in June and stayed at a row level for both July and August.Nonetheless, there appear to be a resurgence in infection rate after August. The comeback of infection rate might be explained by the reopening policy of the state government. We will expect a further rebound of the infection rate as we enter the winter/flu season. 
+This spaghetti line plot describes the monthly Covid-19 infection rate in 62 New York counties. From the plot, we have observed a peak in May and the rate went down in June and stayed at a row level for both July and August. Nonetheless, there appear to be a resurgence in infection rate after August. The comeback of infection rate might be explained by the reopening policy of the state government. We will expect a further rebound of the infection rate as we enter the winter/flu season. 
