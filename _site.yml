@@ -6,9 +6,7 @@ navbar:
     - text: "About"
       href: about.html
     - text: "Overview"
-      href: overview.html
-    - text: "Nusing Home Trends"
-      href: dashboard.html
+      href: overview.html 
     - text: "Mapping"
       href: mapping.html
     - text: "Analysis"

@@ -129,12 +129,9 @@ library(rvest)
 library(lattice)
 library(faraway)
 library(broom)
-library(tidyverse)
-library(dplyr)
 library(HH)
 library(leaps)
 library(corrplot)    
-library(caret)
 ```
 
 ```{r, message=FALSE}
@@ -146,7 +143,7 @@ read_csv("./data/final_df.csv") %>%
   filter_all(all_vars(!is.infinite(.)))
 
 
- residents_df =
+residents_df =
 read_csv("./data/final_df.csv") %>%
   janitor::clean_names() %>% 
   select(monthly_fatality_rate) %>% 

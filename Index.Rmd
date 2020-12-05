@@ -43,4 +43,3 @@ Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km362
 * <b>[Mapping](mapping.html)</b>: COVID-19 Map For New York State in May 2020
 * <b>[Analysis](analysis.html)</b>: Statistical analysis for our project, including Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
 * <b>[Fun Explorations](more.html)</b>: Discuss other factors, such as political influence and nursing home facility, and how they may relate to the situations in NY nursing homes.
-* <b>[Nursing Home Trends](dashboard.html)</b>: Multiple trend comparisons of nursing homes between different counties.

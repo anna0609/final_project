@@ -1,14 +1,16 @@
 ---
-title: "COVID-19 Map For New York in May 2020"
+title: "COVID-19 Map and Trend for New York"
 output:
   html_document:
     code_folding: hide
 ---
+
 ```{r warning=FALSE, message=FALSE, echo = FALSE}
 library(tidyverse)
 library(leaflet)
 library(knitr)
-opts_chunk$set(fig.width = 11, fig.height = 7)
+library(plotly)
+opts_chunk$set(fig.width = 10, fig.height = 7)
 ```
 
 ```{r warning=FALSE, message=FALSE}
@@ -26,11 +28,43 @@ mapping_df = read_csv("./data/overall_df_2020.11.27.csv") %>%
       str_c("<b>", county,", ", city, "</b><br>Infection Rate: ",monthly_infection_rate, "</b><br>Fatality Rate: ", monthly_fatality_rate)) 
 
 pal <- colorNumeric(
-  palette = "red",
-  domain = mapping_df$monthly_fatality_rate)
+  palette = "inferno",
+  domain = mapping_df$monthly_fatality_rate
+  )
 
 mapping_df %>%
   leaflet() %>% 
   addProviderTiles(providers$CartoDB.Positron) %>% 
-  addCircleMarkers(~longitude, ~latitude, radius = ~monthly_infection_rate*100, stroke = FALSE, fillOpacity = 0.5, color = ~pal(monthly_fatality_rate), popup = ~click_label)
+  addCircleMarkers(~longitude, ~latitude, radius = ~monthly_infection_rate*100, stroke = FALSE, fillOpacity = 0.5, color = ~pal(monthly_fatality_rate), popup = ~click_label) %>%
+  addLegend("bottomright", pal = pal, values = ~monthly_fatality_rate,
+    title = "Fatality Rate",
+    opacity = 1
+  )
+  
 ```
+
+## Description
+
+Previous study [Retsef, 2020](https://www.jamda.com/article/S1525-8610(20)30736-2/fulltext#%20) has shown that the mortality/case-fatality rates in senior nursing homes are strongly associated with the disease prevalence. While it is challenging for us to calculate the monthly prevalence of Covid-19 since we could not obtain the county population by each month and the existing cases of Covid-19, it is wholesome to focus on the monthly infection rate instead. This page provides visual representations of Covid-19 pattern in 62 New York counties. 
+
+This interactive map records both the infection rate and the case fatality rate of Covid-19 for all counties in New York. Each Red circle represents the geographic location of the county seat and the radius of the circle is proportional to county's Covid-19 infection rate and the color of the circle is corresponding to county's Covid-19 fatality rate. Due to the limitation of incomplete dataset, only data on May 2020 is shown.
+
+-------------------
+
+## Covid-19 Trend in New York
+
+```{r message=FALSE}
+ggplotly(
+  read_csv("./data/overall_df_2020.11.27.csv") %>%
+  janitor::clean_names() %>%
+  ggplot(aes(month, monthly_infection_rate, color = county)) +
+  scale_x_continuous(limits = c(5, 9)) + 
+  geom_line() +
+  xlab("Month in 2020") +
+  ylab("Monthly Covid-19 Infection Rate") +
+  ggtitle("Covid-19 Infection Rate In New York Across Month")
+)
+```
+
+
+For the monthly Covid-19 infection rate in New York, we have observed a peak in May. Then the rate went down in June and stayed at a row level for both July and August.Nonetheless, there appear to be a resurgence in infection rate after August. The comeback of infection rate might be explained by the reopening policy of the state government. We will expect a further rebound of the infection rate as we enter the winter/flu season. 
