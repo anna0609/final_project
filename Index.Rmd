@@ -42,7 +42,7 @@ Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km362
 
 * <b>[Overview](overview.html)</b>: Multiple trend comparisons between nursing homes(county as unit) and the whole country.
 
-* <b>[Mapping](mapping.html)</b>: COVID-19 Map For New York State in May 2020
+* <b>[Mapping](mapping.html)</b>: COVID-19 Map and Trend For New York State
 
 * <b>[Analysis](analysis.html)</b>: Statistical analysis for our project, including Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
 
