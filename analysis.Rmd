@@ -8,115 +8,8 @@ output:
 ---
 In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
 
-## 1. Correlation Matrix
 
-```{r, include=FALSE}
-library(tidyverse)
-library(corrplot)
-library("Hmisc")
-library("PerformanceAnalytics")
-library(lmtest)
-library(sjPlot)
-library("ggplot2")                  
-library("GGally") 
-```
-
-```{r, include=FALSE}
-data1 =
-read_csv("./data/overall_df_2020.11.27.csv")
-data2 =
-read_csv("./data/county_poll.csv")
-final_df =
-left_join(data1, data2, by = "county")
-write_csv(final_df, path = "./data/final_df.csv")
-```
-
-Paired plot for correlation variables
-```{r, message = FALSE}
-options(warn = -1)
-my_data =
-read_csv("./data/final_df.csv") %>%
-  janitor::clean_names() %>% 
-  relocate(election_result) %>% 
-  mutate(
-   election_result = recode(election_result, "D" = "1", "R" = "0")
-   ) %>% 
-  mutate(election_result = as.numeric(election_result)) %>% 
-  select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
-
-res = round(cor(my_data, use = "complete.obs"),3) #handle missing value
-```
-
-
-```{r, include = FALSE}
-pair_plot_df =
-  my_data %>% 
-  rename(residents_covid19_cases = residents_covid19_cases_per_month) %>% 
-  rename(residents_covid19_deaths = residents_covid19_deaths_per_month) %>% 
-  rename(ventilator_dependent_unit = ventilator_dependent_unit_monthly) %>% 
-  rename(total_shortage_stuff = total_shortage_stuff_monthly) %>% 
-  rename(new_tests_performed = monthly_new_tests_performed) %>% 
-  rename(new_positives = monthly_new_positives) %>% 
-  rename(infection_rate = monthly_infection_rate) %>% 
-  rename(fatality_rate = monthly_fatality_rate) %>% 
-  rename(county_occupancy = county_monthly_occupancy) %>% 
-  rename(county_prevalence = county_monthly_prevalence) %>% 
-  rename(county_cases = county_monthly_cases)
-```
-
-
-```{r, message = FALSE}
-ggpairs(pair_plot_df, 1:4)
-ggpairs(pair_plot_df, 5:9)+  
-  theme(axis.text.x = element_text(angle = 90, vjust = 1, 
-    size = 9, hjust = 1))
-ggpairs(pair_plot_df, 10:14)+
-  theme(axis.text.x = element_text(angle = 90, vjust = 1, 
-    size = 9, hjust = 1))
-
-res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
-  
-# Extract the correlation coefficients：res2$r
-# Extract p-values：res2$P
-```
-
-heat map for correlation matrix
-```{r, message = FALSE}
-# format the correlation matrix
-flattenCorrMatrix <- function(cormat, pmat) {
-  ut <- upper.tri(cormat)
-  data.frame(
-    row = rownames(cormat)[row(cormat)[ut]],
-    column = rownames(cormat)[col(cormat)[ut]],
-    cor  =(cormat)[ut],
-    p = pmat[ut]
-    )
-}
-
-res2 = rcorr(as.matrix(my_data[,1:14]))
-tidy_df = 
-  flattenCorrMatrix(res2$r, res2$P) %>%
-  mutate_if(is.numeric, ~round(., 2))
-
-#display a chart of a correlation matrix
-#chart.Correlation(my_data, histogram=TRUE, pch=19)
-# heat map
-#col<- colorRampPalette(c("blue", "white", "red"))(20)
-#heatmap(x = res, col = col, symm = TRUE)
-
-ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
- geom_tile(color = "white")+
- scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
-   midpoint = 0, limit = c(-1,1), space = "Lab", 
-   name="Pearson\nCorrelation") +
-  theme_minimal()+ 
- theme(axis.text.x = element_text(angle = 90, vjust = 1, 
-    size = 9, hjust = 1))+
- coord_fixed() + 
-geom_text(aes(x=row, y=column, label=cor), color = "black", size = 2)
-```
-
-## 2. Wilcoxon Rank-sum Test 
+## 1. Wilcoxon Rank-sum Test 
 
 We are going to Compare the NY State residents and nursing home seniors’ medians level of fatality rate and infection rate.
 
@@ -138,7 +31,7 @@ library(corrplot)
 nursing_house_df =
 read_csv("./data/final_df.csv") %>%
   janitor::clean_names() %>% 
-  select(nh_monthly_fatality_rate) %>% 
+    dplyr::select(nh_monthly_fatality_rate) %>% 
   drop_na() %>% 
   filter_all(all_vars(!is.infinite(.)))
 
@@ -146,7 +39,7 @@ read_csv("./data/final_df.csv") %>%
 residents_df =
 read_csv("./data/final_df.csv") %>%
   janitor::clean_names() %>% 
-  select(monthly_fatality_rate) %>% 
+    dplyr::select(monthly_fatality_rate) %>% 
   drop_na()
 ```
 
@@ -186,7 +79,7 @@ From the Wilcoxon rank sum test with continuity correction, we can see the p-val
 nursing_house_df2 =
 read_csv("./data/final_df.csv") %>%
   janitor::clean_names() %>% 
-  select(county_monthly_prevalence) %>% 
+    dplyr::select(county_monthly_prevalence) %>% 
   rename(nh_monthly_infection_rate = county_monthly_prevalence) %>% 
   drop_na() %>% 
   filter_all(all_vars(!is.infinite(.)))
@@ -195,7 +88,7 @@ read_csv("./data/final_df.csv") %>%
  residents_df2 =
 read_csv("./data/final_df.csv") %>%
   janitor::clean_names() %>% 
-  select(monthly_infection_rate) %>% 
+    dplyr::select(monthly_infection_rate) %>% 
   drop_na()
 ```
 
@@ -227,6 +120,117 @@ res
 
 From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 2.2e-16 < 0.05. Therefore, we reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the different for NY State residents and nursing home seniors.
 
+
+## 2. Correlation Matrix
+
+```{r, include=FALSE}
+library(tidyverse)
+library(corrplot)
+library("Hmisc")
+library("PerformanceAnalytics")
+library(lmtest)
+library(sjPlot)
+library("ggplot2")                  
+library("GGally") 
+```
+
+```{r, include=FALSE}
+data1 =
+read_csv("./data/overall_df_2020.11.27.csv")
+data2 =
+read_csv("./data/county_poll.csv")
+final_df =
+left_join(data1, data2, by = "county")
+write_csv(final_df, path = "./data/final_df.csv")
+```
+
+Paired plot for correlation variables
+```{r, message = FALSE}
+options(warn = -1)
+my_data =
+read_csv("./data/final_df.csv") %>%
+  janitor::clean_names() %>% 
+  relocate(election_result) %>% 
+  mutate(
+   election_result = recode(election_result, "D" = "1", "R" = "0")
+   ) %>% 
+  mutate(election_result = as.numeric(election_result)) %>% 
+    dplyr::select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
+
+res = round(cor(my_data, use = "complete.obs"),3)#handle missing value
+
+pair_plot_df =
+  my_data %>% 
+  rename(x7 = ventilator_dependent_unit_monthly) %>% 
+  rename(x6 = total_shortage_stuff_monthly) %>% 
+  rename(x5 = monthly_infection_rate) %>% 
+  rename(x4 = monthly_fatality_rate) %>% 
+  rename(x3 = staff_flu_vaccination_rate) %>% 
+  rename(x2 = nh_occupancy_rate) %>% 
+  rename(x1 = election_result) %>% 
+  select(x1,x2,x3,x4,x5,x6,x7)
+
+
+ggpairs(pair_plot_df, 1:7)+  
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+    size = 9, hjust = 1))
+
+res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
+  
+# Extract the correlation coefficients：res2$r
+# Extract p-values：res2$P
+```
+
+     
+heat map for correlation matrix
+```{r, message = FALSE}
+# format the correlation matrix
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+
+res2 = rcorr(as.matrix(my_data[,1:14]))
+tidy_df = 
+  flattenCorrMatrix(res2$r, res2$P) %>%
+  mutate_if(is.numeric, ~round(., 2))
+
+#display a chart of a correlation matrix
+#chart.Correlation(my_data, histogram=TRUE, pch=19)
+# heat map
+#col<- colorRampPalette(c("blue", "white", "red"))(20)
+#heatmap(x = res, col = col, symm = TRUE)
+
+ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Pearson\nCorrelation") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+    size = 9, hjust = 1))+
+ coord_fixed() + 
+geom_text(aes(x=row, y=column, label=cor), color = "black", size = 2)
+```
+
+From the correlation matrix, we can see that the variable county_monthly prevalence: nursing home monthly infection rate has a weak positive relationship with election result, the coefficient correlation is 0.005.
+ 
+nursing home monthly infection rate has a positive weak relationship with total_shortage_stuff_monthly, the coefficient correlation is 0.046.
+
+nursing home monthly infection rate has a positive weak relationship with ventilator_dependent_unit_monthly, the coefficient correlation is 0.015.
+
+nursing home monthly infection rate has a positive relationship with residents monthly_infection_rate, the coefficient correlation is 0.777.
+
+nursing home monthly infection rate has a positive relationship with residents monthly_fatality_rate, the coefficient correlation is 0.159.
+
+nursing home monthly infection rate has a positive weak relationship with staff_flu_vaccination_rate, the coefficient correlation is 0.101.
+
+nursing home monthly infection rate has a negative weak relationship with nrusing home occupancy_rate, the coefficient correlation is -0.115.
 
 ## 3. Multiple Linear Regression with Panel Data
 
@@ -341,7 +345,7 @@ We use AIC regression for the modeling.
 no.na.data = 
   my_data_lm %>% 
   na.omit() %>% 
-  select(
+  dplyr::select(
     -county,
     -month
   )
@@ -357,9 +361,7 @@ aic_res2 = lm(county_monthly_prevalence
               + ventilator_dependent_unit_monthly
               + monthly_infection_rate 
               + monthly_fatality_rate,
-              
               data = no.na.data
-                
                 )
 summary(aic_res2)
 

@@ -374,9 +374,6 @@ div.tocify {
   <a href="overview.html">Overview</a>
 </li>
 <li>
-  <a href="dashboard.html">Nusing Home Trends</a>
-</li>
-<li>
   <a href="mapping.html">Mapping</a>
 </li>
 <li>
@@ -432,19 +429,36 @@ read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
    election_result = recode(election_result, &quot;D&quot; = &quot;1&quot;, &quot;R&quot; = &quot;0&quot;)
    ) %&gt;% 
   mutate(election_result = as.numeric(election_result)) %&gt;% 
-  select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
+    dplyr::select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
 
-res = round(cor(my_data, use = &quot;complete.obs&quot;),3) #handle missing value</code></pre>
-<pre class="r"><code>ggpairs(pair_plot_df, 1:4)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+res = round(cor(my_data, use = &quot;complete.obs&quot;),3) #handle missing value
+
+pair_plot_df =
+  my_data %&gt;% 
+  rename(covid19_cases = residents_covid19_cases_per_month) %&gt;% 
+  rename(covid19_deaths = residents_covid19_deaths_per_month) %&gt;% 
+  rename(ventilator = ventilator_dependent_unit_monthly) %&gt;% 
+  rename(shortage_stuff = total_shortage_stuff_monthly) %&gt;% 
+  rename(test_perform = monthly_new_tests_performed) %&gt;% 
+  rename(new_positives = monthly_new_positives) %&gt;% 
+  rename(infection_rate = monthly_infection_rate) %&gt;% 
+  rename(fatality_rate = monthly_fatality_rate) %&gt;% 
+  rename(occupancy = county_monthly_occupancy) %&gt;% 
+  rename(prevalence = county_monthly_prevalence) %&gt;% 
+  rename(cases = county_monthly_cases) %&gt;% 
+  rename(vaccin_rate = staff_flu_vaccination_rate)
+
+
+ggpairs(pair_plot_df, 1:4)</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <pre class="r"><code>ggpairs(pair_plot_df, 5:9)+  
   theme(axis.text.x = element_text(angle = 90, vjust = 1, 
     size = 9, hjust = 1))</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
 <pre class="r"><code>ggpairs(pair_plot_df, 10:14)+
   theme(axis.text.x = element_text(angle = 90, vjust = 1, 
     size = 9, hjust = 1))</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-3-3.png" width="672" /></p>
 <pre class="r"><code>res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
   
 # Extract the correlation coefficients：res2$r
@@ -482,7 +496,7 @@ ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
     size = 9, hjust = 1))+
  coord_fixed() + 
 geom_text(aes(x=row, y=column, label=cor), color = &quot;black&quot;, size = 2)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
 <div id="wilcoxon-rank-sum-test" class="section level2">
 <h2>2. Wilcoxon Rank-sum Test</h2>
@@ -494,15 +508,15 @@ geom_text(aes(x=row, y=column, label=cor), color = &quot;black&quot;, size = 2)<
 <pre class="r"><code>nursing_house_df =
 read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;% 
-  select(nh_monthly_fatality_rate) %&gt;% 
+    dplyr::select(nh_monthly_fatality_rate) %&gt;% 
   drop_na() %&gt;% 
   filter_all(all_vars(!is.infinite(.)))
 
 
- residents_df =
+residents_df =
 read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;% 
-  select(monthly_fatality_rate) %&gt;% 
+    dplyr::select(monthly_fatality_rate) %&gt;% 
   drop_na()</code></pre>
 <pre class="r"><code>par(mfrow=c(2,2))
 hist(nursing_house_df$nh_monthly_fatality_rate, xlab = &quot;nh_monthly_fatality_rate&quot;, freq=T, main=&quot;nursing home monthly fatality rate&quot;)
@@ -513,7 +527,7 @@ qqline(nursing_house_df$nh_monthly_fatality_rate, col = 1,lwd=2,lty=2)
 
 qqnorm(residents_df$monthly_fatality_rate, col=2, pch=19, cex=1.5)
 qqline(residents_df$monthly_fatality_rate, col = 1,lwd=2,lty=2)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly fatality rate and residents monthly fatality rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:</p>
 <p>H0: The medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.</p>
 <p>Ha: The medians level of monthly fatality rate are different for NY State residents and nursing home seniors.</p>
@@ -546,7 +560,7 @@ res</code></pre>
 <pre class="r"><code>nursing_house_df2 =
 read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;% 
-  select(county_monthly_prevalence) %&gt;% 
+    dplyr::select(county_monthly_prevalence) %&gt;% 
   rename(nh_monthly_infection_rate = county_monthly_prevalence) %&gt;% 
   drop_na() %&gt;% 
   filter_all(all_vars(!is.infinite(.)))
@@ -555,7 +569,7 @@ read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
  residents_df2 =
 read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
   janitor::clean_names() %&gt;% 
-  select(monthly_infection_rate) %&gt;% 
+    dplyr::select(monthly_infection_rate) %&gt;% 
   drop_na()</code></pre>
 <pre class="r"><code>par(mfrow=c(2,2))
 hist(nursing_house_df2$nh_monthly_infection_rate, xlab = &quot;nh_monthly_fatality_rate&quot;, freq=T, main=&quot;nursing home monthly fatality rate&quot;)
@@ -566,7 +580,7 @@ qqline(nursing_house_df2$nh_monthly_infection_rate, col = 1,lwd=2,lty=2)
 
 qqnorm(residents_df2$monthly_infection_rate, col=2, pch=19, cex=1.5)
 qqline(residents_df2$monthly_infection_rate, col = 1,lwd=2,lty=2)</code></pre>
-<p><img src="analysis_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="analysis_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly infection rate and residents monthly infection rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:</p>
 <p>H0: The medians level of monthly infection rate are the same for NY State residents and nursing home seniors.</p>
 <p>Ha: The medians level of monthly infection rate are different for NY State residents and nursing home seniors.</p>
@@ -678,20 +692,15 @@ step3 = update(step2, .~. -nh_occupancy_rate)
 step4 = update(step3, .~. -staff_flu_vaccination_rate)
 
 
-# diagnostic MLR
-layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
-diag_plot1 = plot(step4)</code></pre>
-<p><img src="analysis_files/figure-html/panel%20data%20model%20fiting-1.png" width="672" /></p>
-<pre class="r"><code>diag_plot1</code></pre>
-<pre><code>## NULL</code></pre>
-<pre class="r"><code># test heteroskedasticity
-bptest(step4)</code></pre>
-<pre><code>## 
-##  studentized Breusch-Pagan test
-## 
-## data:  step4
-## BP = 75.091, df = 3, p-value = 3.464e-16</code></pre>
-<pre class="r"><code># ensemble models summary table
+# # diagnostic MLR
+# layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+# diag_plot1 = plot(step4)
+# diag_plot1
+
+# # test heteroskedasticity
+# bptest(step4)
+
+# ensemble models summary table
 mlr_tab1 = 
   tab_model(step4, step3, step2, step1, show.p = TRUE, show.ci = FALSE)
 
@@ -978,8 +987,8 @@ R<sup>2</sup> / R<sup>2</sup> adjusted
 </ol>
 </div>
 </div>
-<div id="simple-mlr-without-longitudinal-form" class="section level2">
-<h2>4. Simple MLR without longitudinal form</h2>
+<div id="mlr-without-panel-data-form" class="section level2">
+<h2>4. MLR Without panel data form</h2>
 <p>We continue to use simple multiple linear regression to predict the nursing home prevalence. This will give us a more generalized model.</p>
 <p>We use AIC regression for the modeling.</p>
 <div id="a-mlr-stepwise-aic-regression" class="section level3">
@@ -993,7 +1002,7 @@ R<sup>2</sup> / R<sup>2</sup> adjusted
 no.na.data = 
   my_data_lm %&gt;% 
   na.omit() %&gt;% 
-  select(
+  dplyr::select(
     -county,
     -month
   )
@@ -1038,9 +1047,7 @@ summary(step_ml)</code></pre>
               + ventilator_dependent_unit_monthly
               + monthly_infection_rate 
               + monthly_fatality_rate,
-              
               data = no.na.data
-                
                 )
 summary(aic_res2)</code></pre>
 <pre><code>## 
@@ -1066,18 +1073,14 @@ summary(aic_res2)</code></pre>
 ## Residual standard error: 0.03791 on 114 degrees of freedom
 ## Multiple R-squared:  0.7063, Adjusted R-squared:  0.6959 
 ## F-statistic: 68.52 on 4 and 114 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code># diagnostics
-layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
-plot(aic_res2)</code></pre>
-<p><img src="analysis_files/figure-html/simple%20MLR-1.png" width="672" /></p>
-<pre class="r"><code># test heteroskedasticity
-bptest(aic_res2)</code></pre>
-<pre><code>## 
-##  studentized Breusch-Pagan test
-## 
-## data:  aic_res2
-## BP = 37.203, df = 4, p-value = 1.636e-07</code></pre>
-<pre class="r"><code># summary table
+<pre class="r"><code># # diagnostics
+# layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+# plot(aic_res2)
+
+# # test heteroskedasticity
+# bptest(aic_res2)
+
+# summary table
 mlr_tab2 = 
   tab_model(aic_res2, show.p = TRUE, show.ci = FALSE)
 
