@@ -7,7 +7,7 @@ output:
     toc_float: true
 ---
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 library(tidyverse)
 library(ggplot2)
 library(plotly)
@@ -15,7 +15,7 @@ library(gganimate)
 ```
 
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 # read in raw data "overall_df.csv"
 overall_df = 
   read.csv("./data/final_df.csv") %>% 
@@ -23,7 +23,7 @@ overall_df =
 ```
 
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 # explore the trend of infection rate
 NH_infection_rate =
   overall_df %>% 
@@ -46,7 +46,7 @@ ggplotly(compare_infection_rate)%>%
                      x = 0.3, y = -0.2))  
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 # explore the trend of case fatality rate
 NH_case_fatality_rate =
   overall_df %>% 
@@ -66,8 +66,7 @@ ggplot() +
 compare_fatality_rate
 ```
 
-
-```{r}
+```{r warning=FALSE, message=FALSE}
 infection_rate =
   overall_df %>% 
   select(month, county, county_monthly_prevalence, monthly_infection_rate) %>% 
@@ -89,7 +88,7 @@ compare_infection_rate =
   labs(title ="Trend of Infection Rate by Month", 
        x = 'Month',
        y = 'Infection Rate'
-  )
+  ) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "bottom") 
 
@@ -99,7 +98,7 @@ ggplotly(compare_infection_rate)%>%
                      x = 0.3, y = -0.2))
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 infection_rate_2 =
   overall_df %>% 
   select(month, county, county_monthly_prevalence, monthly_infection_rate) %>% 
@@ -122,7 +121,7 @@ compare_infection_rate_2 =
   labs(title ="Trend of Average Infection Rates between May and October by County", 
        x = 'County',
        y = 'Infection Rate'
-  )
+  )+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
   theme(legend.position = "bottom") 
 
@@ -132,7 +131,7 @@ ggplotly(compare_infection_rate_2)%>%
 
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 case_fatality_rate =
   overall_df %>% 
   select(month, county, nh_monthly_fatality_rate, monthly_fatality_rate) %>% 
@@ -155,7 +154,7 @@ compare_fatality_rate =
   labs(title ="Trend of Case Fatality Rate by Month", 
        x = 'Month',
        y = 'Case Fatality Rate'
-  )
+  ) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "bottom") 
 
@@ -165,7 +164,7 @@ ggplotly(compare_fatality_rate)%>%
                      x = 0.3, y = -0.2))
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 case_fatality_rate_2 =
   overall_df %>% 
   select(month, county, nh_monthly_fatality_rate, monthly_fatality_rate) %>% 
@@ -188,7 +187,7 @@ compare_fatality_rate_2 =
   labs(title ="Trend of Average Case Fatatlity Rates between May and October by County", 
        x = 'Month',
        y = 'Case Fatality Rate'
-  )
+  ) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "bottom") 
 
@@ -197,9 +196,10 @@ ggplotly(compare_fatality_rate_2)%>%
     layout(legend = list(orientation = "h",   # show entries horizontally
                      x = 0.3, y = -0.2))
 ```
+
 # Trends of new cases per month of nursing homes against counties
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 # explore the trend of new cases per month
 NH_newcase_permonth =
   overall_df %>% 
@@ -218,7 +218,8 @@ ggplot() +
 
 ggplotly(monthly_new_cases)
 ```
-```{r}
+
+```{r warning=FALSE, message=FALSE}
 infection_rate_2b =
   overall_df %>% 
   select(month, county, county_monthly_prevalence, monthly_infection_rate) %>% 
@@ -239,10 +240,9 @@ compare_infection_rate_2b =
   labs(title ="Trend of Average Infection Rates between May and October by County", 
        x = 'County',
        y = 'Infection Rate'
-  )
+  ) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "bottom") 
 
 compare_infection_rate_2b
-
 ```
