@@ -36,7 +36,8 @@ This dataset has COVID-19 cases and death information for the whole New York Sta
 
 ## Report
 
-Here is our comprehensive report for this project.
-[report](https://docs.google.com/document/d/1370npMtfiqkceQMIkAd-xPgct-9zpoZfjs-TbdFPZVY/edit)
+Here is our comprehensive [report](https://docs.google.com/document/d/1370npMtfiqkceQMIkAd-xPgct-9zpoZfjs-TbdFPZVY/edit) for this project.
 
 ## Screencast
+
+Here's our Youtube [screencast](https://www.youtube.com/watch?v=6SSAoUF59IU) to introduce our project.

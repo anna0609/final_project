@@ -136,7 +136,7 @@ res$statistic<-res$statistic + 311*(311+1)/2
 res
 ```
 
-From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 2.2e-16 < 0.05. Therefore, we reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the different for NY State residents and nursing home seniors.<br/>
+From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 2.2e-16 < 0.05. Therefore, we reject null hypothesis. We are 95% confident that the medians level of monthly infection rate are the different for NY State residents and nursing home seniors.<br/>
 
 
 ## 2. Correlation Matrix

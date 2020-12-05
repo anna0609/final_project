@@ -22,6 +22,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -32,7 +34,7 @@
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-      </style>
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -187,7 +189,7 @@ $(document).ready(function () {
   href = window.location.pathname
   href = href.substr(href.lastIndexOf('/') + 1)
   if (href === "")
-    href = "Index.html";
+    href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
   // mark it active
@@ -278,7 +280,7 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="Index.html">Home</a>
+      <a class="navbar-brand" href="index.html">Home</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -347,10 +349,11 @@ $(document).ready(function () {
 </div>
 <div id="report" class="section level2">
 <h2>Report</h2>
-<p>Here is our comprehensive report for this project. <a href="https://docs.google.com/document/d/1370npMtfiqkceQMIkAd-xPgct-9zpoZfjs-TbdFPZVY/edit">report</a></p>
+<p>Here is our comprehensive <a href="https://docs.google.com/document/d/1370npMtfiqkceQMIkAd-xPgct-9zpoZfjs-TbdFPZVY/edit">report</a> for this project.</p>
 </div>
 <div id="screencast" class="section level2">
 <h2>Screencast</h2>
+<p>Here’s our Youtube <a href="https://www.youtube.com/watch?v=6SSAoUF59IU">screencast</a> to introduce our project.</p>
 </div>
 
 
@@ -362,7 +365,7 @@ $(document).ready(function () {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
