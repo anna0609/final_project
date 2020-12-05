@@ -26,6 +26,8 @@
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -36,7 +38,7 @@
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-      </style>
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -372,9 +374,6 @@ div.tocify {
   <a href="overview.html">Overview</a>
 </li>
 <li>
-  <a href="dashboard.html">Nusing Home Trends</a>
-</li>
-<li>
   <a href="mapping.html">Mapping</a>
 </li>
 <li>
@@ -417,32 +416,11 @@ div.tocify {
 </div>
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --</code></pre>
-<pre><code>## v ggplot2 3.3.2     v purrr   0.3.4
-## v tibble  3.0.3     v dplyr   1.0.2
-## v tidyr   1.1.2     v stringr 1.4.0
-## v readr   1.4.0     v forcats 0.5.0</code></pre>
-<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(p8105.datasets)
+<pre class="r"><code>library(tidyverse)
+library(p8105.datasets)
 library(ggplot2)
-library(plotly)</code></pre>
-<pre><code>## Warning: package &#39;plotly&#39; was built under R version 4.0.3</code></pre>
-<pre><code>## 
-## Attaching package: &#39;plotly&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
-## 
-##     last_plot</code></pre>
-<pre><code>## The following object is masked from &#39;package:stats&#39;:
-## 
-##     filter</code></pre>
-<pre><code>## The following object is masked from &#39;package:graphics&#39;:
-## 
-##     layout</code></pre>
-<pre class="r"><code>library(gganimate)</code></pre>
-<pre><code>## Warning: package &#39;gganimate&#39; was built under R version 4.0.3</code></pre>
+library(plotly)
+library(gganimate)</code></pre>
 <div id="nh-home-overview" class="section level1">
 <h1>NH Home overview</h1>
 <pre class="r"><code># read in raw data &quot;overall_df.csv&quot;
@@ -466,8 +444,6 @@ ggplot() +
   theme(legend.position = &quot;right&quot;) 
 
 monthly_new_cases</code></pre>
-<pre><code>## Warning: Removed 38 rows containing missing values (geom_point).</code></pre>
-<pre><code>## Warning: Removed 60 rows containing missing values (geom_point).</code></pre>
 <p><img src="overview_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <pre class="r"><code># explore the trend of infection rate
 NH_infection_rate =
@@ -486,8 +462,6 @@ ggplot() +
   theme(legend.position = &quot;right&quot;) 
 
 compare_infection_rate</code></pre>
-<pre><code>## Warning: Removed 49 rows containing missing values (geom_point).</code></pre>
-<pre><code>## Warning: Removed 60 rows containing missing values (geom_point).</code></pre>
 <p><img src="overview_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code># explore the trend of case fatality rate
 NH_case_fatality_rate =
@@ -506,8 +480,6 @@ ggplot() +
   theme(legend.position = &quot;right&quot;) 
 
 compare_fatality_rate</code></pre>
-<pre><code>## Warning: Removed 180 rows containing missing values (geom_point).</code></pre>
-<pre><code>## Warning: Removed 60 rows containing missing values (geom_point).</code></pre>
 <p><img src="overview_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 
@@ -522,7 +494,7 @@ compare_fatality_rate</code></pre>
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();

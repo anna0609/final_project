@@ -47,7 +47,7 @@ mapping_df %>%
 
 Previous study [Sun, 2020](https://www.jamda.com/article/S1525-8610(20)30736-2/fulltext#%20) has shown that the mortality/case-fatality rates in senior nursing homes are strongly associated with the disease prevalence. While it is challenging for us to calculate the monthly prevalence of Covid-19 since we could not obtain the county population by each month and the existing cases of Covid-19, it is wholesome to focus on the monthly infection rate instead. This page provides visual representations of Covid-19 patterns in 62 New York counties. 
 
-This interactive map records both the infection rate and the case fatality rate of Covid-19 for all counties in New York. Each circle represents the geographic location of the county seat and the radius of the circle is proportional to county's Covid-19 infection rate and the color of the circle is corresponding to county's Covid-19 fatality rate. Due to the limitation of incomplete dataset, only data on May 2020 is used
+This interactive map records both the infection rate and the case fatality rate of Covid-19 for all counties in New York. Each circle represents the geographic location of the county seat and the radius of the circle is proportional to county's Covid-19 infection rate and the color of the circle is corresponding to county's Covid-19 fatality rate. Due to the limitation of incomplete dataset, only data on May 2020 is used.
 
 -------------------
 
