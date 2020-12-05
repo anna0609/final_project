@@ -1,5 +1,386 @@
 ---
 title: "Analysis"
-output:
-  html_document
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
 ---
+In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.<br/>
+
+```{r, include=FALSE}
+library(tidyverse)
+library(corrplot)
+library("Hmisc")
+library("PerformanceAnalytics")
+library(lmtest)
+library(sjPlot)
+library("ggplot2")                  
+library("GGally") 
+
+data1 =
+read_csv("./data/overall_df_2020.11.27.csv")
+data2 =
+read_csv("./data/county_poll.csv")
+final_df =
+left_join(data1, data2, by = "county")
+write_csv(final_df, path = "./data/final_df.csv")
+```
+
+## 1. Wilcoxon Rank-sum Test 
+
+We are going to Compare the NY State residents and nursing home seniors’ medians level of fatality rate and infection rate.<br/>
+
+### a) Compare the NY State residents and nursing home seniors’ medians level of fatality rate.
+
+#### test normality
+
+```{r, include=FALSE}
+library(rvest)
+library(lattice)
+library(faraway)
+library(broom)
+library(HH)
+library(leaps)
+library(corrplot)    
+```
+
+```{r, message=FALSE}
+nursing_house_df =
+read_csv("./data/final_df.csv") %>%
+  janitor::clean_names() %>% 
+    dplyr::select(nh_monthly_fatality_rate) %>% 
+  drop_na() %>% 
+  filter_all(all_vars(!is.infinite(.)))
+
+
+residents_df =
+read_csv("./data/final_df.csv") %>%
+  janitor::clean_names() %>% 
+    dplyr::select(monthly_fatality_rate) %>% 
+  drop_na()
+```
+
+```{r, message=FALSE}
+par(mfrow=c(2,2))
+hist(nursing_house_df$nh_monthly_fatality_rate, xlab = "nh_monthly_fatality_rate", freq=T, main="nursing home monthly fatality rate")
+hist(residents_df$monthly_fatality_rate, xlab = "monthly_fatality_rate", freq=T, main="residents monthly fatality rate")
+
+qqnorm(nursing_house_df$nh_monthly_fatality_rate, col=2, pch=19, cex=1.5)
+qqline(nursing_house_df$nh_monthly_fatality_rate, col = 1,lwd=2,lty=2)
+
+qqnorm(residents_df$monthly_fatality_rate, col=2, pch=19, cex=1.5)
+qqline(residents_df$monthly_fatality_rate, col = 1,lwd=2,lty=2)
+```
+
+From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly fatality rate and residents monthly fatality rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:
+
+H0: The medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.
+
+Ha:  The medians level of monthly fatality rate are different for NY State residents and nursing home seniors.<br/>
+
+```{r, message=FALSE}
+res <- wilcox.test(nursing_house_df$nh_monthly_fatality_rate, residents_df$monthly_fatality_rate, mu=0)
+nursing_house_df %>% count()
+residents_df %>% count()
+res$statistic<-res$statistic + 300*(300+1)/2
+res
+```
+
+From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 0.3194 > 0.05. Therefore, we fail to reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.<br/>
+
+
+### b) Compare the NY State residents and nursing home seniors’ medians level of infection rate.
+
+#### test normality
+```{r, message=FALSE}
+nursing_house_df2 =
+read_csv("./data/final_df.csv") %>%
+  janitor::clean_names() %>% 
+    dplyr::select(county_monthly_prevalence) %>% 
+  rename(nh_monthly_infection_rate = county_monthly_prevalence) %>% 
+  drop_na() %>% 
+  filter_all(all_vars(!is.infinite(.)))
+
+
+ residents_df2 =
+read_csv("./data/final_df.csv") %>%
+  janitor::clean_names() %>% 
+    dplyr::select(monthly_infection_rate) %>% 
+  drop_na()
+```
+
+```{r}
+par(mfrow=c(2,2))
+hist(nursing_house_df2$nh_monthly_infection_rate, xlab = "nh_monthly_fatality_rate", freq=T, main="nursing home monthly fatality rate")
+hist(residents_df2$monthly_infection_rate, xlab = "monthly_fatality_rate", freq=T, main="residents monthly fatality rate")
+
+qqnorm(nursing_house_df2$nh_monthly_infection_rate, col=2, pch=19, cex=1.5)
+qqline(nursing_house_df2$nh_monthly_infection_rate, col = 1,lwd=2,lty=2)
+
+qqnorm(residents_df2$monthly_infection_rate, col=2, pch=19, cex=1.5)
+qqline(residents_df2$monthly_infection_rate, col = 1,lwd=2,lty=2)
+```
+
+From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly infection rate and residents monthly infection rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:
+
+H0: The medians level of monthly infection rate are the same for NY State residents and nursing home seniors.
+
+Ha:  The medians level of monthly infection rate are different for NY State residents and nursing home seniors.<br/>
+
+```{r, message=FALSE}
+res <- wilcox.test(nursing_house_df2$nh_monthly_infection_rate, residents_df2$monthly_infection_rate, mu=0)
+nursing_house_df2 %>% count()
+residents_df2 %>% count()
+res$statistic<-res$statistic + 311*(311+1)/2
+res
+```
+
+From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 2.2e-16 < 0.05. Therefore, we reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the different for NY State residents and nursing home seniors.<br/>
+
+
+## 2. Correlation Matrix
+
+Paired plot for correlation variables<br/>
+```{r, message = FALSE}
+options(warn = -1)
+my_data =
+read_csv("./data/final_df.csv") %>%
+  janitor::clean_names() %>% 
+  relocate(election_result) %>% 
+  mutate(
+   election_result = recode(election_result, "D" = "1", "R" = "0")
+   ) %>% 
+  mutate(election_result = as.numeric(election_result)) %>% 
+    dplyr::select(-county,-month, -nh_monthly_fatality_rate, -total_supply_ppe_monthly) # reasons to delete last two variables is corr coef are NA.
+
+res = round(cor(my_data, use = "complete.obs"),3)#handle missing value
+
+pair_plot_df =
+  my_data %>% 
+  rename(x7 = ventilator_dependent_unit_monthly) %>% 
+  rename(x6 = total_shortage_stuff_monthly) %>% 
+  rename(x5 = monthly_infection_rate) %>% 
+  rename(x4 = monthly_fatality_rate) %>% 
+  rename(x3 = staff_flu_vaccination_rate) %>% 
+  rename(x2 = nh_occupancy_rate) %>% 
+  rename(x1 = election_result) %>% 
+  dplyr::select(x1,x2,x3,x4,x5,x6,x7)
+
+
+ggpairs(pair_plot_df, 1:7)+  
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+    size = 9, hjust = 1))
+
+res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
+  
+# Extract the correlation coefficients：res2$r
+# Extract p-values：res2$P
+```
+
+     
+heat map for correlation matrix<br/>
+```{r, message = FALSE}
+# format the correlation matrix
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+
+res2 = rcorr(as.matrix(my_data[,1:14]))
+tidy_df = 
+  flattenCorrMatrix(res2$r, res2$P) %>%
+  mutate_if(is.numeric, ~round(., 2))
+
+#display a chart of a correlation matrix
+#chart.Correlation(my_data, histogram=TRUE, pch=19)
+# heat map
+#col<- colorRampPalette(c("blue", "white", "red"))(20)
+#heatmap(x = res, col = col, symm = TRUE)
+
+ggplot(data =tidy_df, aes(x=row, y=column, fill=cor))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Pearson\nCorrelation") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+    size = 9, hjust = 1))+
+ coord_fixed() + 
+geom_text(aes(x=row, y=column, label=cor), color = "black", size = 2)
+```
+
+From the correlation matrix, we can see that the variable county_monthly prevalence: nursing home monthly infection rate has a weak positive relationship with election result, the coefficient correlation is 0.005.
+ 
+nursing home monthly infection rate has a positive weak relationship with total_shortage_stuff_monthly, the coefficient correlation is 0.046.
+
+nursing home monthly infection rate has a positive weak relationship with ventilator_dependent_unit_monthly, the coefficient correlation is 0.015.
+
+nursing home monthly infection rate has a positive relationship with residents monthly_infection_rate, the coefficient correlation is 0.777.
+
+nursing home monthly infection rate has a positive relationship with residents monthly_fatality_rate, the coefficient correlation is 0.159.
+
+nursing home monthly infection rate has a positive weak relationship with staff_flu_vaccination_rate, the coefficient correlation is 0.101.
+
+nursing home monthly infection rate has a negative weak relationship with nrusing home occupancy_rate, the coefficient correlation is -0.115.<br/>
+
+## 3. Multiple Linear Regression with Panel Data
+
+The Data is containing information with county and date. To better eliminate bias and capture entity effect and time effect in the model, we first try a panel data regression.<br/>
+
+Note here we are exploring the nursing home prevalence rate as dependent variable.<br/>
+
+### a)MLR model: panel data regression using backward elimination to select features
+
+0. filter NAs in predictors
+1. Select potential predictors according to correlation matrix and epidemiology concept
+2. create initial model with longitudinal data
+3. using backward elimination to do feature selection
+4. diagnostics with homoskedasticity and residual
+
+```{r mlr models panel data, message=FALSE}
+
+my_data_lm =
+read_csv("./data/final_df.csv") %>%
+  janitor::clean_names() %>% 
+  relocate(election_result) %>% 
+  mutate(
+   election_result = ifelse(election_result=="D", "1","0")
+   ) %>% 
+  mutate(
+    election_result = as.numeric(election_result),
+    county = as.factor(county),
+    month = as.factor(month)
+  ) %>% 
+  mutate(
+      nh_occupancy_rate = ifelse(nh_occupancy_rate >= 1, NA,nh_occupancy_rate)
+  ) %>% 
+  drop_na() %>% 
+  filter_all(all_vars(is.finite(.)))
+```
+
+
+```{r panel data model fiting, message=FALSE}
+
+# all potential predictors
+multi_fit =
+  lm(county_monthly_prevalence
+     ~ election_result
+     + nh_occupancy_rate
+     + staff_flu_vaccination_rate
+     + total_shortage_stuff_monthly
+     + ventilator_dependent_unit_monthly
+     + monthly_infection_rate
+     + monthly_fatality_rate,
+     
+     data = my_data
+  )
+summary(multi_fit)
+
+# backward elimination
+step1 = update(multi_fit, . ~ . -total_shortage_stuff_monthly)
+
+#step2
+step2 = update(step1, .~. -election_result)
+
+#step3
+step3 = update(step2, .~. -nh_occupancy_rate)
+
+# stpe4
+step4 = update(step3, .~. -staff_flu_vaccination_rate)
+
+
+# # diagnostic MLR
+# layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+# diag_plot1 = plot(step4)
+# diag_plot1
+
+# # test heteroskedasticity
+# bptest(step4)
+
+# ensemble models summary table
+mlr_tab1 = 
+  tab_model(step4, step3, step2, step1, show.p = TRUE, show.ci = FALSE)
+
+mlr_tab1
+
+```
+
+
+The result table shows a model summary for several potential predictors to best predict nursing home monthly prevalence rate. From the best fitted regression model(1), we learned that 
+
+0. out of expectation, we conclude that election result cannot affect nursing home COVID prevalence. This is probably affected by the fact that we are using binary election outcome, if we use a continuous measurement of election and political belief, it might change the regression result.
+
+1. ventilator can decrease nursing home COVID prevalence, although in a small amount. If there is sufficient ventilator in the facility, COVID prevalence wold decrease by 2%
+
+2. the nursing home COVID prevalence is largely dependent on infection rate of its county. Each 0.1% increase in the county infection rate would increase nursing home prevalence by 38.3%
+
+3. each 10% increase in county's fatality rate would increase 130% nursing home prevalence
+
+
+## 4. MLR Without panel data form
+
+We continue to use simple multiple linear regression to predict the nursing home prevalence. This will give us a more generalized model.
+
+We use AIC regression for the modeling.
+
+
+### a) MLR stepwise AIC regression
+
+1. convert data to non-longitudinal form
+2. use step AIC regression to perform feature selection
+3. diagnostics
+
+```{r simple MLR, message = FALSE}
+
+# clear entity and states
+no.na.data = 
+  my_data_lm %>% 
+  na.omit() %>% 
+  dplyr::select(
+    -county,
+    -month
+  )
+
+# step AIC regression
+aic_res <- lm(county_monthly_prevalence ~ ., data=no.na.data)
+step_ml = step(aic_res, direction='backward', trace = 0)
+
+summary(step_ml)
+
+aic_res2 = lm(county_monthly_prevalence 
+              ~nh_occupancy_rate
+              + ventilator_dependent_unit_monthly
+              + monthly_infection_rate 
+              + monthly_fatality_rate,
+              data = no.na.data
+                )
+summary(aic_res2)
+
+# # diagnostics
+# layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+# plot(aic_res2)
+
+# # test heteroskedasticity
+# bptest(aic_res2)
+
+# summary table
+mlr_tab2 = 
+  tab_model(aic_res2, show.p = TRUE, show.ci = FALSE)
+
+mlr_tab2
+
+```
+
+From this table, we can confirm the directions of predictors in our previous panel data regression. Ventilator still has negative yet small effect. However, county infection rate and fatality rate has a larger coefficient here. 
+
+Both the models reached a 71% R2, which shows the models can explain 71% of variability in the data.
+
+
+
+
