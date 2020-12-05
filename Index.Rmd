@@ -14,7 +14,7 @@ county_poll = read_excel("./data/nycounty_results.xlsx") %>%
   mutate(
     results = ifelse(biden_pct > 0.5, "D", "R") #D stands for Democratic party win and R stands for Republican Party win
   ) %>%
-  select(county, results)
+  dplyr::select(county, results)
 
 county_poll
 ```
@@ -39,8 +39,11 @@ Jianting Shi(js5095), Minjie Bao(mb4757), Pangsibo Shen(ps3194), Phoebe Mo(km362
 ### Website Navigation:
 
 * <b>[About](about.html)</b>: A brief introduction of our project including our motivation, data sources, and report.
+
 * <b>[Overview](overview.html)</b>: Multiple trend comparisons between nursing homes(county as unit) and the whole country.
-* <b>[Mapping](mapping.html)</b>: COVID-19 Map For New York State in May 2020
+
+* <b>[Mapping](mapping.html)</b>: COVID-19 Map and Trend For New York State
+
 * <b>[Analysis](analysis.html)</b>: Statistical analysis for our project, including Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
+
 * <b>[Fun Explorations](more.html)</b>: Discuss other factors, such as political influence and nursing home facility, and how they may relate to the situations in NY nursing homes.
-* <b>[Nursing Home Trends](dashboard.html)</b>: Multiple trend comparisons of nursing homes between different counties.
