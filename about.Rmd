@@ -24,14 +24,19 @@ The NYC nursing home profile data has different details focusing on the new york
 
 [Presidential election data for NY](https://www.politico.com/2020-election/results/new-york/)
 
-As election day just passed, it will be interesting to observe the distributons of election data in different counties, and analyze if there is any significant findings related to it. We will separate counties into democratic or republican counties according to the election data listed, and examine the relationship with Covid infections/mortality rate.
+As election day just passed, it will be interesting to observe the distributions of election data in different counties, and analyze if there is any significant findings related to it. We will separate counties into democratic or republican counties according to the election data listed, and examine the relationship with Covid infections/mortality rate.
 
 [New York Statewide covid-19 testing data](https://health.data.ny.gov/Health/New-York-State-Statewide-COVID-19-Testing/xdss-u53e/data)
 
 This dataset has COVID-19 testing information for the whole New York State beginning from the March. For each county, it has record of such as cumulative number of tests and cumulative positive cases. We use this information to catch the infection rate for each county.
 
+[New York County fatality](https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/state/new-york)
+
+This dataset has COVID-19 cases and death information for the whole New York State, it has recorded the number of known cases and death. We use this information to catch the case fatality rate for each county.
+
 ## Report
 
 Here is our comprehensive report for this project.
+[report](https://docs.google.com/document/d/1370npMtfiqkceQMIkAd-xPgct-9zpoZfjs-TbdFPZVY/edit)
 
 ## Screencast
