@@ -8,6 +8,24 @@ output:
 ---
 In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
 
+```{r, include=FALSE}
+library(tidyverse)
+library(corrplot)
+library("Hmisc")
+library("PerformanceAnalytics")
+library(lmtest)
+library(sjPlot)
+library("ggplot2")                  
+library("GGally") 
+
+data1 =
+read_csv("./data/overall_df_2020.11.27.csv")
+data2 =
+read_csv("./data/county_poll.csv")
+final_df =
+left_join(data1, data2, by = "county")
+write_csv(final_df, path = "./data/final_df.csv")
+```
 
 ## 1. Wilcoxon Rank-sum Test 
 
@@ -123,27 +141,6 @@ From the Wilcoxon rank sum test with continuity correction, we can see the p-val
 
 ## 2. Correlation Matrix
 
-```{r, include=FALSE}
-library(tidyverse)
-library(corrplot)
-library("Hmisc")
-library("PerformanceAnalytics")
-library(lmtest)
-library(sjPlot)
-library("ggplot2")                  
-library("GGally") 
-```
-
-```{r, include=FALSE}
-data1 =
-read_csv("./data/overall_df_2020.11.27.csv")
-data2 =
-read_csv("./data/county_poll.csv")
-final_df =
-left_join(data1, data2, by = "county")
-write_csv(final_df, path = "./data/final_df.csv")
-```
-
 Paired plot for correlation variables
 ```{r, message = FALSE}
 options(warn = -1)
@@ -168,7 +165,7 @@ pair_plot_df =
   rename(x3 = staff_flu_vaccination_rate) %>% 
   rename(x2 = nh_occupancy_rate) %>% 
   rename(x1 = election_result) %>% 
-  select(x1,x2,x3,x4,x5,x6,x7)
+  dplyr::select(x1,x2,x3,x4,x5,x6,x7)
 
 
 ggpairs(pair_plot_df, 1:7)+  
