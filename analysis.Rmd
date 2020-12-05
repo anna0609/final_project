@@ -6,7 +6,7 @@ output:
     toc: true
     toc_float: true
 ---
-In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.
+In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.<br/>
 
 ```{r, include=FALSE}
 library(tidyverse)
@@ -29,7 +29,7 @@ write_csv(final_df, path = "./data/final_df.csv")
 
 ## 1. Wilcoxon Rank-sum Test 
 
-We are going to Compare the NY State residents and nursing home seniors’ medians level of fatality rate and infection rate.
+We are going to Compare the NY State residents and nursing home seniors’ medians level of fatality rate and infection rate.<br/>
 
 ### a) Compare the NY State residents and nursing home seniors’ medians level of fatality rate.
 
@@ -77,7 +77,7 @@ From the Histogram and QQ Plot, we can see that the distribution of nursing home
 
 H0: The medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.
 
-Ha:  The medians level of monthly fatality rate are different for NY State residents and nursing home seniors.
+Ha:  The medians level of monthly fatality rate are different for NY State residents and nursing home seniors.<br/>
 
 ```{r, message=FALSE}
 res <- wilcox.test(nursing_house_df$nh_monthly_fatality_rate, residents_df$monthly_fatality_rate, mu=0)
@@ -87,7 +87,7 @@ res$statistic<-res$statistic + 300*(300+1)/2
 res
 ```
 
-From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 0.3194 > 0.05. Therefore, we fail to reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.
+From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 0.3194 > 0.05. Therefore, we fail to reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.<br/>
 
 
 ### b) Compare the NY State residents and nursing home seniors’ medians level of infection rate.
@@ -126,7 +126,7 @@ From the Histogram and QQ Plot, we can see that the distribution of nursing home
 
 H0: The medians level of monthly infection rate are the same for NY State residents and nursing home seniors.
 
-Ha:  The medians level of monthly infection rate are different for NY State residents and nursing home seniors.
+Ha:  The medians level of monthly infection rate are different for NY State residents and nursing home seniors.<br/>
 
 ```{r, message=FALSE}
 res <- wilcox.test(nursing_house_df2$nh_monthly_infection_rate, residents_df2$monthly_infection_rate, mu=0)
@@ -136,12 +136,12 @@ res$statistic<-res$statistic + 311*(311+1)/2
 res
 ```
 
-From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 2.2e-16 < 0.05. Therefore, we reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the different for NY State residents and nursing home seniors.
+From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 2.2e-16 < 0.05. Therefore, we reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the different for NY State residents and nursing home seniors.<br/>
 
 
 ## 2. Correlation Matrix
 
-Paired plot for correlation variables
+Paired plot for correlation variables<br/>
 ```{r, message = FALSE}
 options(warn = -1)
 my_data =
@@ -179,7 +179,7 @@ res2 = rcorr(as.matrix(my_data)) # calculate the correlation p-values
 ```
 
      
-heat map for correlation matrix
+heat map for correlation matrix<br/>
 ```{r, message = FALSE}
 # format the correlation matrix
 flattenCorrMatrix <- function(cormat, pmat) {
@@ -227,13 +227,13 @@ nursing home monthly infection rate has a positive relationship with residents m
 
 nursing home monthly infection rate has a positive weak relationship with staff_flu_vaccination_rate, the coefficient correlation is 0.101.
 
-nursing home monthly infection rate has a negative weak relationship with nrusing home occupancy_rate, the coefficient correlation is -0.115.
+nursing home monthly infection rate has a negative weak relationship with nrusing home occupancy_rate, the coefficient correlation is -0.115.<br/>
 
 ## 3. Multiple Linear Regression with Panel Data
 
-The Data is containing information with county and date. To better eliminate bias and capture entity effect and time effect in the model, we first try a panel data regression.
+The Data is containing information with county and date. To better eliminate bias and capture entity effect and time effect in the model, we first try a panel data regression.<br/>
 
-Note here we are exploring the nursing home prevalence rate as dependent variable.
+Note here we are exploring the nursing home prevalence rate as dependent variable.<br/>
 
 ### a)MLR model: panel data regression using backward elimination to select features
 

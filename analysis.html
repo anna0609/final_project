@@ -416,10 +416,10 @@ div.tocify {
 </div>
 
 
-<p>In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.</p>
+<p>In this section we are going to do the following three analysis: Correlation Matrix, Wilcoxon Rank-sum Test and Regression.<br/></p>
 <div id="wilcoxon-rank-sum-test" class="section level2">
 <h2>1. Wilcoxon Rank-sum Test</h2>
-<p>We are going to Compare the NY State residents and nursing home seniors’ medians level of fatality rate and infection rate.</p>
+<p>We are going to Compare the NY State residents and nursing home seniors’ medians level of fatality rate and infection rate.<br/></p>
 <div id="a-compare-the-ny-state-residents-and-nursing-home-seniors-medians-level-of-fatality-rate." class="section level3">
 <h3>a) Compare the NY State residents and nursing home seniors’ medians level of fatality rate.</h3>
 <div id="test-normality" class="section level4">
@@ -449,7 +449,7 @@ qqline(residents_df$monthly_fatality_rate, col = 1,lwd=2,lty=2)</code></pre>
 <p><img src="analysis_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly fatality rate and residents monthly fatality rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:</p>
 <p>H0: The medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.</p>
-<p>Ha: The medians level of monthly fatality rate are different for NY State residents and nursing home seniors.</p>
+<p>Ha: The medians level of monthly fatality rate are different for NY State residents and nursing home seniors.<br/></p>
 <pre class="r"><code>res &lt;- wilcox.test(nursing_house_df$nh_monthly_fatality_rate, residents_df$monthly_fatality_rate, mu=0)
 nursing_house_df %&gt;% count()</code></pre>
 <pre><code>## # A tibble: 1 x 1
@@ -469,7 +469,7 @@ res</code></pre>
 ## data:  nursing_house_df$nh_monthly_fatality_rate and residents_df$monthly_fatality_rate
 ## W = 72365, p-value = 0.3194
 ## alternative hypothesis: true location shift is not equal to 0</code></pre>
-<p>From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 0.3194 &gt; 0.05. Therefore, we fail to reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.</p>
+<p>From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 0.3194 &gt; 0.05. Therefore, we fail to reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the same for NY State residents and nursing home seniors.<br/></p>
 </div>
 </div>
 <div id="b-compare-the-ny-state-residents-and-nursing-home-seniors-medians-level-of-infection-rate." class="section level3">
@@ -502,7 +502,7 @@ qqline(residents_df2$monthly_infection_rate, col = 1,lwd=2,lty=2)</code></pre>
 <p><img src="analysis_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>From the Histogram and QQ Plot, we can see that the distribution of nursing home monthly infection rate and residents monthly infection rates are heavily right skewed. Therefore, they violated the normality assumptions. We are going to use non-parametric test: Wilcoxon Rank - Sum Test to do the following hypothesis test:</p>
 <p>H0: The medians level of monthly infection rate are the same for NY State residents and nursing home seniors.</p>
-<p>Ha: The medians level of monthly infection rate are different for NY State residents and nursing home seniors.</p>
+<p>Ha: The medians level of monthly infection rate are different for NY State residents and nursing home seniors.<br/></p>
 <pre class="r"><code>res &lt;- wilcox.test(nursing_house_df2$nh_monthly_infection_rate, residents_df2$monthly_infection_rate, mu=0)
 nursing_house_df2 %&gt;% count()</code></pre>
 <pre><code>## # A tibble: 1 x 1
@@ -522,13 +522,13 @@ res</code></pre>
 ## data:  nursing_house_df2$nh_monthly_infection_rate and residents_df2$monthly_infection_rate
 ## W = 70184, p-value &lt; 2.2e-16
 ## alternative hypothesis: true location shift is not equal to 0</code></pre>
-<p>From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 2.2e-16 &lt; 0.05. Therefore, we reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the different for NY State residents and nursing home seniors.</p>
+<p>From the Wilcoxon rank sum test with continuity correction, we can see the p-value is 2.2e-16 &lt; 0.05. Therefore, we reject null hypothesis. We are 95% confident that the medians level of monthly fatality rate are the different for NY State residents and nursing home seniors.<br/></p>
 </div>
 </div>
 </div>
 <div id="correlation-matrix" class="section level2">
 <h2>2. Correlation Matrix</h2>
-<p>Paired plot for correlation variables</p>
+<p>Paired plot for correlation variables<br/></p>
 <pre class="r"><code>options(warn = -1)
 my_data =
 read_csv(&quot;./data/final_df.csv&quot;) %&gt;%
@@ -562,7 +562,7 @@ ggpairs(pair_plot_df, 1:7)+
   
 # Extract the correlation coefficients：res2$r
 # Extract p-values：res2$P</code></pre>
-<p>heat map for correlation matrix</p>
+<p>heat map for correlation matrix<br/></p>
 <pre class="r"><code># format the correlation matrix
 flattenCorrMatrix &lt;- function(cormat, pmat) {
   ut &lt;- upper.tri(cormat)
@@ -602,12 +602,12 @@ geom_text(aes(x=row, y=column, label=cor), color = &quot;black&quot;, size = 2)<
 <p>nursing home monthly infection rate has a positive relationship with residents monthly_infection_rate, the coefficient correlation is 0.777.</p>
 <p>nursing home monthly infection rate has a positive relationship with residents monthly_fatality_rate, the coefficient correlation is 0.159.</p>
 <p>nursing home monthly infection rate has a positive weak relationship with staff_flu_vaccination_rate, the coefficient correlation is 0.101.</p>
-<p>nursing home monthly infection rate has a negative weak relationship with nrusing home occupancy_rate, the coefficient correlation is -0.115.</p>
+<p>nursing home monthly infection rate has a negative weak relationship with nrusing home occupancy_rate, the coefficient correlation is -0.115.<br/></p>
 </div>
 <div id="multiple-linear-regression-with-panel-data" class="section level2">
 <h2>3. Multiple Linear Regression with Panel Data</h2>
-<p>The Data is containing information with county and date. To better eliminate bias and capture entity effect and time effect in the model, we first try a panel data regression.</p>
-<p>Note here we are exploring the nursing home prevalence rate as dependent variable.</p>
+<p>The Data is containing information with county and date. To better eliminate bias and capture entity effect and time effect in the model, we first try a panel data regression.<br/></p>
+<p>Note here we are exploring the nursing home prevalence rate as dependent variable.<br/></p>
 <div id="amlr-model-panel-data-regression-using-backward-elimination-to-select-features" class="section level3">
 <h3>a)MLR model: panel data regression using backward elimination to select features</h3>
 <ol start="0" style="list-style-type: decimal">
