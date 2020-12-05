@@ -9,40 +9,19 @@ output:
 
 ```{r}
 library(tidyverse)
-library(p8105.datasets)
 library(ggplot2)
 library(plotly)
 library(gganimate)
 ```
 
-# NH Home overview
 
 ```{r}
 # read in raw data "overall_df.csv"
 overall_df = 
-  read.csv("./data/overall_df_2020.11.27.csv") %>% 
+  read.csv("./data/final_df.csv") %>% 
   janitor::clean_names()
 ```
 
-```{r}
-# explore the trend of new cases per month
-NH_newcase_permonth =
-  overall_df %>% 
-  select(month, county, residents_covid19_cases_per_month)
-
-County_newcase_permonth = 
-  overall_df %>% 
-  select(month, county, monthly_new_positives)
-
-monthly_new_cases =
-ggplot() +
-  geom_point(data = NH_newcase_permonth, aes(x = month, y = residents_covid19_cases_per_month), color = "blue") +
-  geom_point(data = County_newcase_permonth, aes(x = month, y = monthly_new_positives), color = "black") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  theme(legend.position = "right") 
-
-monthly_new_cases
-```
 
 ```{r}
 # explore the trend of infection rate
@@ -61,7 +40,10 @@ ggplot() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   theme(legend.position = "right") 
 
-compare_infection_rate
+
+ggplotly(compare_infection_rate)%>% 
+    layout(legend = list(orientation = "h",   # show entries horizontally
+                     x = 0.3, y = -0.2))  
 ```
 
 ```{r}
@@ -84,3 +66,183 @@ ggplot() +
 compare_fatality_rate
 ```
 
+
+```{r}
+infection_rate =
+  overall_df %>% 
+  select(month, county, county_monthly_prevalence, monthly_infection_rate) %>% 
+  drop_na() %>% 
+  group_by(month) %>% 
+  summarize(
+    'Nursing home level' = mean(county_monthly_prevalence),
+    'County level' = mean(monthly_infection_rate)) %>% 
+  pivot_longer(
+    'Nursing home level':'County level',
+    names_to = "level",
+    values_to = "infection_rate"
+               )
+
+compare_infection_rate =
+  infection_rate %>% 
+  ggplot(aes(x = as.factor(month),y = infection_rate, fill = level)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  labs(title ="Trend of Infection Rate by Month", 
+       x = 'Month',
+       y = 'Infection Rate'
+  )
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "bottom") 
+
+
+ggplotly(compare_infection_rate)%>% 
+    layout(legend = list(orientation = "h",   # show entries horizontally
+                     x = 0.3, y = -0.2))
+```
+
+```{r}
+infection_rate_2 =
+  overall_df %>% 
+  select(month, county, county_monthly_prevalence, monthly_infection_rate) %>% 
+  drop_na() %>% 
+  group_by(county) %>% 
+  summarize(
+    'Nursing home level' = mean(county_monthly_prevalence),
+    'County level' = mean(monthly_infection_rate)) %>%  
+  arrange("Nursing home level") %>%
+  pivot_longer(
+    'Nursing home level':'County level',
+    names_to = "level",
+    values_to = "infection_rate"
+               ) 
+
+compare_infection_rate_2 =
+  infection_rate_2 %>% 
+  ggplot(aes(y = county, x = infection_rate, fill = level)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  labs(title ="Trend of Average Infection Rates between May and October by County", 
+       x = 'County',
+       y = 'Infection Rate'
+  )
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+  theme(legend.position = "bottom") 
+
+ggplotly(compare_infection_rate_2)%>% 
+    layout(legend = list(orientation = "h",   # show entries horizontally
+                     x = 0.3, y = -0.2))
+
+```
+
+```{r}
+case_fatality_rate =
+  overall_df %>% 
+  select(month, county, nh_monthly_fatality_rate, monthly_fatality_rate) %>% 
+  drop_na() %>% 
+  filter(is.finite(nh_monthly_fatality_rate)) %>%
+  group_by(month) %>% 
+  summarize(
+    'Nursing home level' = mean(nh_monthly_fatality_rate),
+    'County level' = mean(monthly_fatality_rate)) %>% 
+  pivot_longer(
+    'Nursing home level':'County level',
+    names_to = "level",
+    values_to = "case_fatality_rate"
+               )
+
+compare_fatality_rate =
+  case_fatality_rate %>% 
+  ggplot(aes(x = as.factor(month),y = case_fatality_rate, fill = level)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  labs(title ="Trend of Case Fatality Rate by Month", 
+       x = 'Month',
+       y = 'Case Fatality Rate'
+  )
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "bottom") 
+
+
+ggplotly(compare_fatality_rate)%>% 
+    layout(legend = list(orientation = "h",   # show entries horizontally
+                     x = 0.3, y = -0.2))
+```
+
+```{r}
+case_fatality_rate_2 =
+  overall_df %>% 
+  select(month, county, nh_monthly_fatality_rate, monthly_fatality_rate) %>% 
+  drop_na() %>% 
+  filter(is.finite(nh_monthly_fatality_rate)) %>%
+  group_by(county) %>% 
+  summarize(
+    'Nursing home level' = mean(nh_monthly_fatality_rate),
+    'County level' = mean(monthly_fatality_rate)) %>% 
+  pivot_longer(
+    'Nursing home level':'County level',
+    names_to = "level",
+    values_to = "case_fatality_rate"
+               )
+
+compare_fatality_rate_2 =
+  case_fatality_rate_2 %>% 
+  ggplot(aes(y = county, x = case_fatality_rate, fill = level)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  labs(title ="Trend of Average Case Fatatlity Rates between May and October by County", 
+       x = 'Month',
+       y = 'Case Fatality Rate'
+  )
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "bottom") 
+
+
+ggplotly(compare_fatality_rate_2)%>% 
+    layout(legend = list(orientation = "h",   # show entries horizontally
+                     x = 0.3, y = -0.2))
+```
+# Trends of new cases per month of nursing homes against counties
+
+```{r}
+# explore the trend of new cases per month
+NH_newcase_permonth =
+  overall_df %>% 
+  select(month, county, residents_covid19_cases_per_month)
+
+County_newcase_permonth = 
+  overall_df %>% 
+  select(month, county, monthly_new_positives)
+
+monthly_new_cases =
+ggplot() +
+  geom_point(data = NH_newcase_permonth, aes(x = month, y = residents_covid19_cases_per_month), color = "blue") +
+  geom_point(data = County_newcase_permonth, aes(x = month, y = monthly_new_positives), color = "black") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "right") 
+
+ggplotly(monthly_new_cases)
+```
+```{r}
+infection_rate_2b =
+  overall_df %>% 
+  select(month, county, county_monthly_prevalence, monthly_infection_rate) %>% 
+  drop_na() %>% 
+  group_by(county) %>% 
+  summarize(
+    'Nursing home level' = mean(county_monthly_prevalence),
+    'County level' = mean(monthly_infection_rate)) %>% 
+  arrange("Nursing home level")
+
+compare_infection_rate_2b =
+  infection_rate_2b %>% 
+  ggplot() +
+  geom_segment(aes(x = county, xend = county, y='County level', yend = 'Nursing home level'), color = "grey") +
+  geom_point(aes(x = county, y = 'County level'), color = "blue", size = 3) +
+  geom_point(aes(x = county, y = 'Nursing home level'), color = "red", size = 3) +
+  coord_flip() +
+  labs(title ="Trend of Average Infection Rates between May and October by County", 
+       x = 'County',
+       y = 'Infection Rate'
+  )
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  theme(legend.position = "bottom") 
+
+compare_infection_rate_2b
+
+```
